@@ -14,10 +14,12 @@ permalink: /:title/
 nav:
   - text: Home
     url: /
-  - text: About
-    url: /about
-  - text: Contact
-    url: /contact
+  - text: Teaching
+    url: /teaching
+  - text: Graphics
+    url: /graphics
+  - text: Music
+    url: /music
 
 # Enable GitHub metadata for displaying repository information
 github:
