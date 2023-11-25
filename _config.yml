@@ -1,2 +1,32 @@
-theme: jekyll-theme-minimal
+# Set the site title
 title: Alexandre Lamure's website
+
+# Enable Jekyll's built-in syntax highlighting for code snippets
+highlighter: rouge
+
+# Set the default layout for pages
+layout: default
+
+# Configure permalink structure (optional, customize as needed)
+permalink: /:title/
+
+# Add a navigation menu
+nav:
+  - text: Home
+    url: /
+  - text: About
+    url: /about
+  - text: Contact
+    url: /contact
+
+# Enable GitHub metadata for displaying repository information
+github:
+  repository: AlexandreLamure/AlexandreLamure.github.io
+
+# Set the theme (optional, choose a Jekyll theme)
+theme: jekyll-theme-minimal
+
+# Enable Markdown for posts
+markdown: kramdown
+kramdown:
+  input: GFM
