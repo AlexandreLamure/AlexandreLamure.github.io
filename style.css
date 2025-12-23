@@ -1,9 +1,13 @@
-/* Simple Reset & Variables */
+/* 1. Variables & Global Reset */
 :root {
     --bg: #ffffff;
     --text: #1a1a1a;
     --accent: #0070f3;
     --gray: #f4f4f4;
+    --border: #eeeeee;
+    --line: #dddddd;
+    --yt-red: #FF0000;
+    --sc-orange: #ff5500;
 }
 
 body {
@@ -15,14 +19,14 @@ body {
     padding: 0;
 }
 
-/* Navigation */
+/* 2. Navigation */
 nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 1.5rem 10%;
     background: var(--bg);
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border);
 }
 
 .nav-links {
@@ -35,52 +39,76 @@ nav {
     text-decoration: none;
     color: var(--text);
     font-weight: 500;
+    transition: color 0.2s;
 }
 
-.nav-links a:hover { color: var(--accent); }
+.nav-links a:hover { 
+    color: var(--accent); 
+}
 
-/* Main Layout */
+/* 3. Main Layout Containers */
 .content {
     max-width: 800px;
     margin: 2rem auto;
     padding: 0 1rem;
 }
 
-.btn {
+/* Page-specific width override */
+.wide-page, .wide-content {
+    max-width: 1400px;
+}
+
+/* 4. General Components */
+.btn, .btn-small {
     display: inline-block;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: all 0.2s;
+}
+
+.btn {
     padding: 0.5rem 1rem;
     background: var(--accent);
     color: white;
-    text-decoration: none;
-    border-radius: 5px;
     margin-top: 1rem;
 }
 
-/* Projects Grid (For your graphics.html later) */
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
+.btn-small {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+    color: var(--accent);
+    border: 1px solid var(--accent);
 }
 
-
-
-
-
-/* Teaching Section Styling */
-.course-section {
-    margin-bottom: 3rem;
+.btn-small:hover {
+    background: var(--accent);
+    color: white;
 }
 
-.course-section h2 {
-    margin-bottom: 0.5rem;
+/* 5. Music & Platform Links */
+.platform-link {
+    font-weight: 600;
+    text-decoration: none;
+    padding-bottom: 2px;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
 }
 
-/* We reuse the video-wrapper from the music page for the 16:9 aspect ratio */
+.platform-link.yt { color: var(--yt-red); }
+.platform-link.yt:hover { border-bottom-color: var(--yt-red); }
+
+.platform-link.sc { color: var(--sc-orange); }
+.platform-link.sc:hover { border-bottom-color: var(--sc-orange); }
+
+.page-intro p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
+/* 6. Media & Video Wrappers (16:9) */
 .video-wrapper {
     position: relative;
-    padding-bottom: 56.25%; /* 16:9 ratio */
+    padding-bottom: 56.25%;
     height: 0;
     overflow: hidden;
     border-radius: 8px;
@@ -91,61 +119,59 @@ nav {
 
 .video-wrapper iframe {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
 }
 
-/* Small buttons for links like "Download" or "Code" */
-.btn-small {
-    display: inline-block;
-    padding: 0.4rem 0.8rem;
-    font-size: 0.85rem;
-    color: var(--accent);
-    border: 1px solid var(--accent);
-    text-decoration: none;
-    border-radius: 4px;
-    margin-right: 10px;
-    transition: all 0.2s;
+/* 7. Teaching Grid & Projects */
+.teaching-grid, .grid {
+    display: grid;
+    gap: 80px;
+    margin-top: 2rem;
 }
 
-.btn-small:hover {
-    background: var(--accent);
-    color: white;
+.teaching-grid {
+    grid-template-columns: 1fr 1fr;
 }
 
-
-
-
-
-
-/* Intro paragraph links */
-.platform-link {
-    font-weight: 600;
-    text-decoration: none;
-    padding-bottom: 2px;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s ease;
+.grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
 }
 
-/* YouTube Red */
-.platform-link.yt {
-    color: #FF0000;
-}
-.platform-link.yt:hover {
-    border-bottom-color: #FF0000;
+.course-column {
+    display: flex;
+    flex-direction: column;
 }
 
-/* SoundCloud Orange */
-.platform-link.sc {
-    color: #ff5500;
-}
-.platform-link.sc:hover {
-    border-bottom-color: #ff5500;
+.teaching-grid > section:first-child {
+    border-right: 1px solid var(--line);
+    padding-right: 40px;
 }
 
-.page-intro p {
-    font-size: 1.1rem;
-    line-height: 1.8;
+.resource-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 1rem;
+}
+
+/* 8. Responsive Logic */
+@media (max-width: 1100px) {
+    .teaching-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    
+    .teaching-grid > section:first-child {
+        border-right: none;
+        border-bottom: 1px solid var(--line);
+        padding-right: 0;
+        padding-bottom: 40px;
+    }
+
+    .wide-page, .wide-content {
+        max-width: 800px;
+    }
 }
