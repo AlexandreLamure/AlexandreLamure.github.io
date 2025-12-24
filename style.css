@@ -19,7 +19,7 @@ body {
     padding: 0;
 }
 
-/* 2. Navigation */
+/* 2. Navigation (Standard PC Layout) */
 nav {
     display: flex;
     justify-content: space-between;
@@ -42,8 +42,8 @@ nav {
     transition: color 0.2s;
 }
 
-.nav-links a:hover { 
-    color: var(--accent); 
+.nav-links a:hover {
+    color: var(--accent);
 }
 
 /* 3. Main Layout Containers */
@@ -54,12 +54,14 @@ nav {
 }
 
 /* Page-specific width override */
-.wide-page, .wide-content {
+.wide-page,
+.wide-content {
     max-width: 1400px;
 }
 
 /* 4. General Components */
-.btn, .btn-small {
+.btn,
+.btn-small {
     display: inline-block;
     text-decoration: none;
     border-radius: 5px;
@@ -85,6 +87,63 @@ nav {
     color: white;
 }
 
+/* Social Buttons Container */
+.social-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 1rem;
+}
+
+/* Base Button Style */
+.btn-social {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    color: var(--text);
+    /* Starts with your default text color */
+    background: var(--gray);
+    /* Uses your existing gray variable */
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 1px solid var(--border);
+}
+
+/* Hover Effects */
+.btn-social:hover {
+    transform: translateY(-3px);
+    /* Subtle lift effect */
+    color: white;
+}
+
+/* LinkedIn button */
+.btn-social.li:hover {
+    background-color: #0077b5;
+    /* LinkedIn Blue */
+    border-color: #0077b5;
+}
+
+/* X (Twitter) button */
+.btn-social.tw:hover {
+    background-color: #000000;
+    border-color: #000000;
+}
+
+/* Youtube button */
+.btn-social.yt:hover {
+    background-color: var(--yt-red);
+    border-color: var(--yt-red);
+}
+
+/* Soundcloud button */
+.btn-social.sc:hover {
+    background-color: var(--sc-orange);
+    border-color: var(--sc-orange);
+}
+
 /* 5. Music & Platform Links */
 .platform-link {
     font-weight: 600;
@@ -94,15 +153,37 @@ nav {
     transition: all 0.2s ease;
 }
 
-.platform-link.yt { color: var(--yt-red); }
-.platform-link.yt:hover { border-bottom-color: var(--yt-red); }
+.platform-link.yt {
+    color: var(--yt-red);
+}
 
-.platform-link.sc { color: var(--sc-orange); }
-.platform-link.sc:hover { border-bottom-color: var(--sc-orange); }
+.platform-link.yt:hover {
+    border-bottom-color: var(--yt-red);
+}
+
+.platform-link.sc {
+    color: var(--sc-orange);
+}
+
+.platform-link.sc:hover {
+    border-bottom-color: var(--sc-orange);
+}
 
 .page-intro p {
     font-size: 1.1rem;
     line-height: 1.8;
+}
+
+/* Profile Images */
+.profile-img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    /* Makes the image circular */
+    object-fit: cover;
+    margin-bottom: 1.5rem;
+    border: 3px solid var(--gray);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* 6. Media & Video Wrappers (16:9) */
@@ -114,16 +195,20 @@ nav {
     border-radius: 8px;
     background: #000;
     margin: 1.5rem 0;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .video-wrapper iframe {
     position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
 
 /* 7. Teaching Grid & Projects */
-.teaching-grid, .grid {
+.teaching-grid,
+.grid {
     display: grid;
     gap: 80px;
     margin-top: 2rem;
@@ -143,7 +228,7 @@ nav {
     flex-direction: column;
 }
 
-.teaching-grid > section:first-child {
+.teaching-grid>section:first-child {
     border-right: 1px solid var(--line);
     padding-right: 40px;
 }
@@ -157,21 +242,80 @@ nav {
     margin-top: 1rem;
 }
 
-/* 8. Responsive Logic */
+/* 8. Profile Grid for Index Page */
+.profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    margin-top: 3rem;
+    position: relative;
+}
+
+.profile-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Centers photo and buttons in the column */
+    text-align: center;
+}
+
+/* Vertical separator line */
+.profile-grid>section:first-child {
+    border-right: 1px solid var(--line);
+    padding-right: 40px;
+}
+
+
+/* 9. Responsive Logic (Mobile Layout) */
 @media (max-width: 1100px) {
+
+    /* Hide the Name/Logo div on mobile */
+    nav .logo {
+        display: none;
+    }
+
+    /* Center the nav bar and remove the 'between' spacing */
+    nav {
+        justify-content: center;
+        padding: 1rem 0;
+    }
+
+    /* Ensure the list of links is centered and wraps if needed */
+    .nav-links {
+        padding: 0;
+        margin: 0;
+        justify-content: center;
+        width: 100%;
+    }
+
+    /* Teaching grid adjustments already in your file */
     .teaching-grid {
         grid-template-columns: 1fr;
         gap: 40px;
     }
-    
-    .teaching-grid > section:first-child {
+
+    .teaching-grid>section:first-child {
         border-right: none;
         border-bottom: 1px solid var(--line);
         padding-right: 0;
         padding-bottom: 40px;
     }
 
-    .wide-page, .wide-content {
+    .wide-page,
+    .wide-content {
         max-width: 800px;
+    }
+
+    /* Profile Grid for Index Page */
+    .profile-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .profile-grid>section:first-child {
+        border-right: none;
+        border-bottom: 1px solid var(--line);
+        padding-right: 0;
+        padding-bottom: 40px;
     }
 }
