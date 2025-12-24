@@ -189,6 +189,12 @@ nav {
     line-height: 1.8;
 }
 
+.post-date {
+    color: #666666;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
 /* Profile Images */
 .profile-img {
     width: 200px;
