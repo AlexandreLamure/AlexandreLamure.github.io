@@ -75,6 +75,15 @@ nav {
 }
 
 /* 4. General Components */
+.simple-link {
+    font-weight: 600;
+    text-decoration: none;
+    padding-bottom: 2px;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+    color: var(--accent);
+}
+
 .btn,
 .btn-small {
     display: inline-block;
@@ -339,4 +348,19 @@ nav {
         padding-right: 0;
         padding-bottom: 40px;
     }
+}
+
+/* Background canvas for minimal three.js scene */
+#bg-canvas{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    z-index:-1;
+    pointer-events:none;
+    opacity:1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #bg-canvas { display: none; }
 }

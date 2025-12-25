@@ -4,17 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Alexandre Lamure — software engineer (graphics) and musician. Portfolio of technical projects, music and teaching materials.">
+    <meta name="description"
+        content="Alexandre Lamure — software engineer (graphics) and musician. Portfolio of technical projects, music and teaching materials.">
     <meta name="theme-color" content="#ffffff">
     <!-- Open Graph / Facebook -->
     <meta property="og:title" content="Alexandre Lamure">
-    <meta property="og:description" content="Software engineer and musician — portfolio of graphics, music and teaching.">
+    <meta property="og:description"
+        content="Software engineer and musician — portfolio of graphics, music and teaching.">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="https://media.licdn.com/dms/image/v2/C4D03AQH9suRig390bw/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1578592431458?e=1768435200&v=beta&t=6H6SnRFGpQfD5ZhEgz8vUKuNIKl98DHdSVyOTSjXX4s">
+    <meta property="og:image"
+        content="https://media.licdn.com/dms/image/v2/C4D03AQH9suRig390bw/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1578592431458?e=1768435200&v=beta&t=6H6SnRFGpQfD5ZhEgz8vUKuNIKl98DHdSVyOTSjXX4s">
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Alexandre Lamure">
-    <meta name="twitter:description" content="Software engineer and musician — portfolio of graphics, music and teaching.">
+    <meta name="twitter:description"
+        content="Software engineer and musician — portfolio of graphics, music and teaching.">
     <title>Alexandre Lamure</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -24,6 +28,7 @@
 </head>
 
 <body>
+    <canvas id="bg-canvas"></canvas>
     <header>
         <nav>
             <div class="logo">Alexandre Lamure</div>
@@ -42,32 +47,107 @@
 
         <div class="profile-grid">
             <section class="profile-column">
-                <img src="https://media.licdn.com/dms/image/v2/C4D03AQH9suRig390bw/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1578592431458?e=1768435200&v=beta&t=6H6SnRFGpQfD5ZhEgz8vUKuNIKl98DHdSVyOTSjXX4s" alt="Professional Photo" class="profile-img">
+                <img src="https://media.licdn.com/dms/image/v2/C4D03AQH9suRig390bw/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1578592431458?e=1768435200&v=beta&t=6H6SnRFGpQfD5ZhEgz8vUKuNIKl98DHdSVyOTSjXX4s"
+                    alt="Professional Photo" class="profile-img">
                 <h3>Software Engineer</h3>
                 <div class="social-buttons">
-                    <a href="https://www.linkedin.com/in/alexandre-lamure/" class="btn-social li" target="_blank" rel="noopener noreferrer">
+                    <a href="https://www.linkedin.com/in/alexandre-lamure/" class="btn-social li" target="_blank"
+                        rel="noopener noreferrer">
                         <i class="fab fa-linkedin-in"></i>
                     </a>
-                    <a href="https://x.com/AlexandreLamure" class="btn-social tw" target="_blank" rel="noopener noreferrer">
+                    <a href="https://x.com/AlexandreLamure" class="btn-social tw" target="_blank"
+                        rel="noopener noreferrer">
                         <i class="fab fa-twitter"></i>
                     </a>
                 </div>
             </section>
 
             <section class="profile-column">
-                <img src="https://i1.sndcdn.com/avatars-000492480390-rxt6wj-t500x500.jpg" alt="Artist Photo" class="profile-img">
+                <img src="https://i1.sndcdn.com/avatars-000492480390-rxt6wj-t500x500.jpg" alt="Artist Photo"
+                    class="profile-img">
                 <h3>Musician</h3>
                 <div class="social-buttons">
-                    <a href="https://www.youtube.com/@IMAGO-42" class="btn-social yt" target="_blank" rel="noopener noreferrer">
+                    <a href="https://www.youtube.com/@IMAGO-42" class="btn-social yt" target="_blank"
+                        rel="noopener noreferrer">
                         <i class="fab fa-youtube"></i>
                     </a>
-                    <a href="https://soundcloud.com/imago-42" class="btn-social sc" target="_blank" rel="noopener noreferrer">
+                    <a href="https://soundcloud.com/imago-42" class="btn-social sc" target="_blank"
+                        rel="noopener noreferrer">
                         <i class="fab fa-soundcloud"></i>
                     </a>
                 </div>
             </section>
         </div>
     </main>
+    <script type="module">
+        (async function () {
+            if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+            // Dynamic ES module import (avoids deprecated UMD warning)
+            const THREE = await import('https://unpkg.com/three@0.158.0/build/three.module.js');
+            const { WebGLRenderer, Scene, Camera, PlaneGeometry, ShaderMaterial, Mesh, Vector2, Color } = THREE;
+
+            const canvas = document.getElementById('bg-canvas');
+            const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: false });
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+            // Use CSS --bg as clear color when possible
+            var cssBg = getComputedStyle(document.documentElement).getPropertyValue('--bg') || '#ffffff';
+            cssBg = cssBg.trim() || '#ffffff';
+            try { renderer.setClearColor(new Color(cssBg)); } catch (e) { renderer.setClearColor(0xffffff); }
+
+            const scene = new Scene();
+            const camera = new Camera();
+            const geometry = new PlaneGeometry(2, 2);
+
+            const uniforms = {
+                iTime: { value: 0 },
+                iResolution: { value: new Vector2(window.innerWidth, window.innerHeight) },
+                u_bg: { value: new Color(cssBg) }
+            };
+
+            let material = null;
+            let mesh = null;
+
+            function createMaterialFromSource(src) {
+                material = new ShaderMaterial({ uniforms, vertexShader: 'void main(){ gl_Position = vec4(position, 1.0); }', fragmentShader: src });
+                mesh = new Mesh(geometry, material);
+                scene.add(mesh);
+            }
+
+            try {
+                const res = await fetch('background-shader.frag');
+                if (!res.ok) throw new Error('failed');
+                const src = await res.text();
+                createMaterialFromSource(src);
+            } catch (e) {
+                // minimal fallback shader
+                createMaterialFromSource('precision mediump float; uniform vec3 u_bg; void main(){ gl_FragColor = vec4(u_bg,1.0); }');
+            }
+
+            function resize() {
+                const w = window.innerWidth, h = window.innerHeight;
+                renderer.setSize(w, h);
+                uniforms.iResolution.value.set(w, h);
+            }
+            resize();
+            window.addEventListener('resize', resize, { passive: true });
+
+            let running = true;
+            document.addEventListener('visibilitychange', () => { running = !document.hidden; if (running) requestAnimationFrame(animate); });
+
+            let last = performance.now();
+            function animate(t) {
+                if (!running) return; // pause when tab is inactive
+                const dt = (t - last) * 0.001;
+                last = t;
+                if (uniforms && uniforms.iTime) uniforms.iTime.value += dt;
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
+            }
+            requestAnimationFrame((t) => { last = t; animate(t); });
+        })();
+    </script>
 </body>
 
 </html>
