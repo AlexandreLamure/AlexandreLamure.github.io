@@ -83,7 +83,7 @@
         (async function () {
             if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-            // Dynamic ES module import (avoids deprecated UMD warning)
+            // Dynamic ES module import
             const THREE = await import('https://unpkg.com/three@0.158.0/build/three.module.js');
             const { WebGLRenderer, Scene, Camera, PlaneGeometry, ShaderMaterial, Mesh, Vector2, Color } = THREE;
 
