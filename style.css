@@ -237,6 +237,20 @@ nav {
     height: 100%;
 }
 
+.media-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 1rem;
+    align-items: start;
+}
+
+/* stack to one column under 600px */
+@media (max-width: 600px) {
+    .media-container {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* 7. Teaching Grid & Projects */
 .teaching-grid,
 .grid {
@@ -382,10 +396,10 @@ nav {
     display: flex;
     flex-wrap: wrap;
     /* enforce identical horizontal and vertical spacing */
-    gap:42px;
+    gap: 42px;
     /* fallback for older browsers */
-    column-gap:42px;
-    row-gap:42px;
+    column-gap: 42px;
+    row-gap: 42px;
     align-content: flex-start;
     justify-content: center;
     margin-top: 1rem;
