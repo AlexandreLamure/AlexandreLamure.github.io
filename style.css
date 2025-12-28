@@ -8,6 +8,7 @@
     --line: #dddddd;
     --yt-red: #FF0000;
     --sc-orange: #ff5500;
+    --showcase-row-height: 340px;
 }
 
 body {
@@ -385,11 +386,6 @@ nav {
 /* === Students Showcase (simple rows with variable widths) === */
 .students-showcase {
     margin-top: 2rem;
-}
-
-/* fixed row height; images scale to this height, widths vary naturally */
-:root {
-    --showcase-row-height: 340px;
 }
 
 .showcase-grid {
