@@ -65,7 +65,7 @@ void main() {
     vec3 color = vec3(1.0 - ((1.0 - voronoi) * dotNoise));
 
     // Fade out
-    float vignette = smoothstep(0.17, 0.8, length(p - vec2(0.0, 0.1)));
+    float vignette = smoothstep(0.17, 0.75, length(p - vec2(0.0, 0.1)));
     float topFade = smoothstep(1.0, 0.5, uv.y);
     const float globalFade = 0.4;
     color = mix(u_bg, color, vignette * topFade * globalFade); // blend with background color

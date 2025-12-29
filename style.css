@@ -213,7 +213,7 @@ nav {
     border-radius: 50%;
     /* Makes the image circular */
     object-fit: cover;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.0rem;
     border: 3px solid var(--gray);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
