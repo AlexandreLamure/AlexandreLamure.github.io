@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stylized GGX shading — sharp specular highlights</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="icon" href="../resources/website-icon.jpg" type="image/jpg">
+    <meta name="theme-color" content="#ffffff">
+    <!-- Syntax highlighting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-clike.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-glsl.min.js"></script>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <div class="logo">Alexandre Lamure</div>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../graphics.html" class="active">Graphics</a></li>
+                <li><a href="../teaching.html">Teaching</a></li>
+                <li><a href="../music.html">Music</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="content">
+        <p><a class="btn-small" href="../graphics.html">Back to graphics</a></p>
+
+        <h1>Stylized GGX shading — sharp specular highlights</h1>
+        <div class="post-date">June 21, 2026</div>
+        <p>To achieve a toon look in 3D rendering, the most common way is to threshold the lighting. It transforms the soft color gradients color gradients into flat colors.</p>
+
+        <pre><code class="language-glsl">// The rendering equation becomes:
+float Threshold = 0.0; // any value between 0 and 1
+vec3 Radiance = BRDF * LightIntensity * <strong>step</strong>(<strong>Threshold</strong>, dot(Normal, LightDirection));</code></pre>
+
+        <div class="image-row" style="display:flex;gap:2rem;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin:1rem 0;margin-bottom:3rem;">
+            <figure style="margin:0;text-align:center;max-width:45%;">
+                <img src="../resources/graphics-posts/graphics-post-01/diffuse-thresholding.png" alt="Diffuse Thresholding" style="width:100%;height:auto;display:block;">
+                <figcaption>Diffuse Thresholding</figcaption>
+            </figure>
+            <figure style="margin:0;text-align:center;max-width:45%;">
+                <img src="../resources/graphics-posts/graphics-post-01/specular-thresholding.png" alt="Specular Thresholding" style="width:100%;height:auto;display:block;">
+                <figcaption>Specular Thresholding</figcaption>
+            </figure>
+        </div>
+
+
+        <p>However, one might want to mix the 2D and 3D looks: <strong>sharp highlights at low roughness</strong> and <strong>soft gradients at high roughness</strong>.
+        It feels more modern than pure toon shading, and the bonus part is that we can rely on PBR for most of our shading, making everyone's lives easier. <br>
+        I'll call this mixed approach "Stylized GGX Shading".
+        </p>
+        <div class="image-row" style="display:flex;gap:2rem;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin:1rem 0;margin-bottom:3rem;">
+            <figure style="margin:0;text-align:center;max-width:45%;">
+                <img src="../resources/website-icon.jpg" alt="Diffuse Thresholding" style="width:100%;height:auto;display:block;">
+                <figcaption>Diffuse Thresholding</figcaption>
+            </figure>
+            <figure style="margin:0;text-align:center;max-width:45%;">
+                <img src="../resources/website-icon.jpg" alt="Specular Thresholding" style="width:100%;height:auto;display:block;">
+                <figcaption>Specular Thresholding</figcaption>
+            </figure>
+        </div>
+
+        <p>
+        Many games have explored that combination of PBR and toon shading.<br>
+        For example in <cite>Zelda: Breath of the Wild</cite>, the characters use a pure toon shading, but the environments rely more on a 3D / PBR look (not completely, e.g. the grass). This makes the characters pop out of the background.
+        </p>
+        <p>
+        Another example is <cite>Spellcasters Chronicles</cite>, which I had the chance to work on. During the development we tested many things, including this "Stylized GGX Shading" I'm describing here. In the end we landed on something else, but it still uses a mix of 2D and 3D looks. 
+
+        <div class="image-row" style="display:flex;gap:2rem;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin:1rem 0;">
+            <figure style="margin:0;text-align:center;max-width:45%;">
+                <img src="https://assets.nintendo.com/image/upload/f_auto/q_auto/dpr_1.5/c_scale,w_900/ncom/en_US/articles/2023/the-final-legend-of-zelda-tears-of-the-kingdom-trailer-is-soaring-your-way/TotK_image3" alt="A screenshot from Zelda: Tears of the Kingdom" style="width:100%;height:auto;display:block;">
+                <figcaption>A screenshot from Zelda: Tears of the Kingdom</figcaption>
+            </figure>
+            <figure style="margin:0;text-align:center;max-width:45%;">
+                <img src="https://cdn.mos.cms.futurecdn.net/uhzhtgEtgwNjqC9sxcrDhM.jpg" alt="A screenshot from Spellcasters Chronicles" style="width:100%;height:auto;display:block;">
+                <figcaption>A screenshot from Spellcasters Chronicles</figcaption>
+            </figure>
+        </div>
+        </p>
+
+        <h2>Simple version</h2>
+        <p>Blablabla</p>
+
+
+        <h2>Advanced version</h2>
+        <p>Blablabla</p>
+
+
+        <h2>With other toon features</h2>
+        <p>Blablabla</p>
+
+        <p><a class="btn-small" href="../graphics.html">Back to graphics</a></p>
+    </main>
+</body>
+
+</html>
