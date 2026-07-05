@@ -10,9 +10,10 @@
     <meta name="theme-color" content="#ffffff">
     <!-- Syntax highlighting -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs/plugins/keep-markup/prism-keep-markup.min.css">
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-clike.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-glsl.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs/plugins/keep-markup/prism-keep-markup.min.js"></script>
 </head>
 
 <body>
@@ -39,7 +40,7 @@
 float Threshold = 0.0; // any value between 0 and 1
 vec3 Radiance = BRDF * LightIntensity * <strong>step</strong>(<strong>Threshold</strong>, dot(Normal, LightDirection));</code></pre>
 
-        <div class="image-row" style="display:flex;gap:2rem;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin:1rem 0;margin-bottom:3rem;">
+        <div class="image-row" style="display:flex;gap:2rem;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin:1rem 0;margin-bottom:4rem;">
             <figure style="margin:0;text-align:center;max-width:45%;">
                 <img src="../resources/graphics-posts/graphics-post-01/diffuse-thresholding.png" alt="Diffuse Thresholding" style="width:100%;height:auto;display:block;">
                 <figcaption>Diffuse Thresholding</figcaption>
@@ -51,18 +52,18 @@ vec3 Radiance = BRDF * LightIntensity * <strong>step</strong>(<strong>Threshold<
         </div>
 
 
-        <p>However, one might want to mix the 2D and 3D looks: <strong>sharp highlights at low roughness</strong> and <strong>soft gradients at high roughness</strong>.
+        <p>However, one might want to mix the 2D and 3D looks: <strong>big sharp highlights at low roughness</strong> and <strong>soft gradients at high roughness</strong>.
         It feels more modern than pure toon shading, and the bonus part is that we can rely on PBR for most of our shading, making everyone's lives easier. <br>
         I'll call this mixed approach "Stylized GGX Shading".
         </p>
-        <div class="image-row" style="display:flex;gap:2rem;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin:1rem 0;margin-bottom:3rem;">
+        <div class="image-row" style="display:flex;gap:2rem;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin:1rem 0;margin-bottom:4rem;">
             <figure style="margin:0;text-align:center;max-width:45%;">
-                <img src="../resources/website-icon.jpg" alt="Diffuse Thresholding" style="width:100%;height:auto;display:block;">
-                <figcaption>Diffuse Thresholding</figcaption>
+                <img src="../resources/website-icon.jpg" alt="PBR GGX Shading" style="width:100%;height:auto;display:block;">
+                <figcaption>PBR GGX Shading</figcaption>
             </figure>
             <figure style="margin:0;text-align:center;max-width:45%;">
-                <img src="../resources/website-icon.jpg" alt="Specular Thresholding" style="width:100%;height:auto;display:block;">
-                <figcaption>Specular Thresholding</figcaption>
+                <img src="../resources/website-icon.jpg" alt="Stylized GGX Shading" style="width:100%;height:auto;display:block;">
+                <figcaption>Stylized GGX Shading</figcaption>
             </figure>
         </div>
 
@@ -83,18 +84,110 @@ vec3 Radiance = BRDF * LightIntensity * <strong>step</strong>(<strong>Threshold<
                 <figcaption>A screenshot from Spellcasters Chronicles</figcaption>
             </figure>
         </div>
+        <br>
         </p>
 
         <h2>Simple version</h2>
-        <p>Blablabla</p>
+        <p>The most common PBR model is the <a class="simple-link" href="https://learnopengl.com/PBR/Theory" target="_blank">GGX Cook-Torrance microfacet model</a>. <br>
+            The surface's asperity is analytically modelled as a collection of oriented microfacets, and controlled by a roughness parameter.
+            The distribution of these microfacets' normals is described by the Normal Distribution Function (NDF).
+            Real-time engines usually use the Trowbridge-Reitz NDF, which looks like this: <br>
+            <pre><code class="language-glsl">// GGX Trowbridge-Reitz NDF
+float D(vec3 Normal, vec3 HalfVector, float Roughness)
+{
+    float a = Roughness * Roughness;
+    float a2 = a * a;
+    float NdotH = max(dot(Normal, HalfVector), 0.0);
+    float NdotH2 = NdotH * NdotH;
+    float denom = NdotH2 * (a2 - 1.0) + 1.0;
+    return a2 / (PI * denom * denom);
+}</code></pre>
+
+            <figure style="margin:0;margin-bottom:3rem;text-align:center;">
+                <img src="../resources/website-icon.jpg" alt="GGX Trowbridge-Reitz NDF result" style="width:100%;height:auto;display:block;">
+                <figcaption>GGX Trowbridge-Reitz NDF result</figcaption>
+            </figure>
+
+            By slightly modifying this equation, we can expand the specular highlights.
+            <pre><code class="language-glsl">// Stylized GGX Trowbridge-Reitz NDF
+float D(vec3 Normal, vec3 HalfVector, float Roughness, float SpecularSize)
+{
+    float a = Roughness * Roughness;
+    float a2 = a * a;
+    float NdotH = max(dot(Normal, HalfVector), 0.0);
+    float NdotH2 = NdotH * NdotH;
+    float denom = <strong>max(</strong><strong>SpecularSize</strong> * NdotH2 * (a2 - 1.0) + 1.0<strong>, 0.0001)</strong>;
+    return a2 / (PI * denom * denom);
+}</code></pre>
+            <figure style="margin:0;margin-bottom:3rem;text-align:center;">
+                <img src="../resources/website-icon.jpg" alt="Stylized GGX Trowbridge-Reitz NDF result" style="width:100%;height:auto;display:block;">
+                <figcaption>Stylized GGX Trowbridge-Reitz NDF result</figcaption>
+            </figure>
+
+            I made a <a class="simple-link" href="https://www.desmos.com/calculator/drjmgelnyy" target="_blank">desmos graph</a> to visualize what's happening (follow the link to play with its parameters). <br>
+            In abcissa, we have the dot product of the surface normal and the half-vector (<code>NdotH</code>). <br>
+            In ordinate, we have the NDF value (the <code>return</code> value). Higher means more reflected energy. <br>
+            <b style="color:black;">Black curve</b> is the original Trowbridge-Reitz NDF, <b style="color:red;">red curve</b> is the stylized one. <br>
+            Our new "Specular Size" parameter allows to return more energy at higher angles while preserving the original shape of the NDF. <br> 
+            <div style="display:flex; gap:2rem; justify-content:center; align-items:flex-start; flex-wrap:wrap; margin:2rem 0; margin-bottom:4rem;">
+                <figure style="margin:0; flex:1 1 320px; max-width:480px; text-align:center;">
+                    <iframe src="https://www.desmos.com/calculator/jnt2ph0v2g?embed" style="width:100%; height:360px; border:1px solid #ddd; border-radius:4px; background:#fff; display:block;" frameborder="0"></iframe>
+                    <figcaption style="margin-top:0.6rem; font-size:0.95rem; color:#555;">Desmos graph animating the Specular Size</figcaption>
+                </figure>
+                <figure style="margin:0; flex:1 1 320px; max-width:480px; text-align:center;">
+                    <img src="../resources/website-icon.jpg" alt="Specular Thresholding" style="width:100%; height:360px; object-fit:cover; display:block; border:1px solid #ddd; border-radius:4px;">
+                    <figcaption style="margin-top:0.6rem; font-size:0.95rem; color:#555;">Resulting highlight shape</figcaption>
+                </figure>
+            </div>
+
+        </p>
 
 
         <h2>Advanced version</h2>
-        <p>Blablabla</p>
+        <p>The simple version has the benefit to be extra cheap (1 mul and 1 max), but it impacts too much rough materials, making them appear overly bright. <br>
+            Here is a slightly more complex equation that preserves the original NDF shape at high roughness, while still expanding the highlights at low roughness. <br>
+<pre><code class="language-glsl">// Stylized GGX Trowbridge-Reitz NDF
+float D(vec3 Normal, vec3 HalfVector, float Roughness, float SpecularSize, float GGXMatching)
+{
+    float a = Roughness * Roughness;
+    float a2 = a * a;
+    float NdotH = max(dot(Normal, HalfVector), 0.0);
+    float NdotH2 = NdotH * NdotH;
+    // The GGXMatching parameter controls how much the stylized NDF matches the GGX one at high roughness. In practice, 2.0 works well.
+    float denom = max((SpecularSize * <strong>pow(1.0 - a, GGXMatching) + 1.0)</strong> * NdotH2 * (a2 - 1.0) + 1.0, 0.00001);
+    return a2 / (PI * denom * denom);
+}</code></pre>
+
+
+            <div style="display:flex; gap:2rem; justify-content:center; align-items:flex-start; flex-wrap:wrap; margin:2rem 0;">
+                <figure style="margin:0; flex:1 1 320px; max-width:480px; text-align:center;">
+                    <img src="../resources/website-icon.jpg" alt="Simple stylized result" style="width:100%; height:360px; object-fit:cover; display:block; border:1px solid #ddd; border-radius:4px;">
+                    <figcaption style="margin-top:0.6rem; font-size:0.95rem; color:#555;">Simple stylized version</figcaption>
+                </figure>
+                <figure style="margin:0; flex:1 1 320px; max-width:480px; text-align:center;">
+                    <img src="../resources/website-icon.jpg" alt="Advanced stylized result" style="width:100%; height:360px; object-fit:cover; display:block; border:1px solid #ddd; border-radius:4px;">
+                    <figcaption style="margin-top:0.6rem; font-size:0.95rem; color:#555;">Advanced stylized version</figcaption>
+                </figure>
+            </div>
+
+            Here is the <a class="simple-link" href="https://www.desmos.com/calculator/drjmgelnyy" target="_blank">desmos graph</a> animating the roughness (at high roughness, the curves flatten). <br>
+            <b style="color:black;">Black curve</b> is the Trowbridge-Reitz NDF, <b style="color:red;">red curve</b> is the simple stylized and <b style="color:green;">green curve</b> is the advanced stylized.
+            The advanced version matches the red curve at high roughness, and the black curve at low roughness.<br>
+            <figure>
+                <iframe src="https://www.desmos.com/calculator/gvbvdlsjas?embed" style="width:100%; height:360px; border:1px solid #ddd; border-radius:4px; background:#fff; display:block;" frameborder="0"></iframe>
+                <figcaption style="margin-top:0.6rem; font-size:0.95rem; color:#555;">Desmos graph animating the roughness</figcaption>
+            </figure>
+
+        </p>
 
 
         <h2>With other toon features</h2>
-        <p>Blablabla</p>
+        <p>Blablabla
+
+            Rim light ? Kuwahara ?
+            Also, clamp the stylized for bloom
+
+        </p>
 
         <p><a class="btn-small" href="../graphics.html">Back to graphics</a></p>
     </main>
