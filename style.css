@@ -573,7 +573,7 @@ nav {
     justify-content: space-between;
     gap: 1.5rem;
     align-items: flex-start;
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid var(--line);
 }

@@ -1,3 +1,4 @@
+window.backgroundShaderSource = `
 /*
 This shader is a minimalist, performant and animated background pattern, displayed on the background edges.
 */
@@ -71,4 +72,4 @@ void main() {
     color = mix(u_bg, color, vignette * topFade * globalFade); // blend with background color
 
     gl_FragColor = vec4(color, 1.0);
-}
+}`;

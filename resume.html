@@ -22,6 +22,8 @@
 </head>
 
 <body>
+    <canvas id="bg-canvas"></canvas> <!-- Background canvas for shader effect -->
+
     <header>
         <nav>
             <div class="logo">Alexandre Lamure</div>
@@ -160,6 +162,74 @@
             </section>
         </article>
     </main>
+
+
+    <!-- Import the shader -->
+    <script src="background-shader.js"></script>
+    <!-- Run the shader -->
+    <script type="module">
+        (async function () {
+            if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+            const shaderSource = window.backgroundShaderSource || 'precision mediump float; uniform vec3 u_bg; void main(){ gl_FragColor = vec4(u_bg, 1.0); }';
+
+            // Dynamic ES module import
+            const THREE = await import('https://unpkg.com/three@0.158.0/build/three.module.js');
+            const { WebGLRenderer, Scene, Camera, PlaneGeometry, ShaderMaterial, Mesh, Vector2, Color } = THREE;
+
+            const canvas = document.getElementById('bg-canvas');
+            const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: false });
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+            // Use CSS --bg as clear color when possible
+            var cssBg = getComputedStyle(document.documentElement).getPropertyValue('--bg') || '#ffffff';
+            cssBg = cssBg.trim() || '#ffffff';
+            try { renderer.setClearColor(new Color(cssBg)); } catch (e) { renderer.setClearColor(0xffffff); }
+
+            const scene = new Scene();
+            const camera = new Camera();
+            const geometry = new PlaneGeometry(2, 2);
+
+            const uniforms = {
+                iTime: { value: 0 },
+                iResolution: { value: new Vector2(window.innerWidth, window.innerHeight) },
+                u_bg: { value: new Color(cssBg) }
+            };
+
+            let material = null;
+            let mesh = null;
+
+            function createMaterialFromSource(src) {
+                material = new ShaderMaterial({ uniforms, vertexShader: 'void main(){ gl_Position = vec4(position, 1.0); }', fragmentShader: src });
+                mesh = new Mesh(geometry, material);
+                scene.add(mesh);
+            }
+
+            createMaterialFromSource(shaderSource);
+
+            function resize() {
+                const w = window.innerWidth, h = window.innerHeight;
+                renderer.setSize(w, h);
+                uniforms.iResolution.value.set(w, h);
+            }
+            resize();
+            window.addEventListener('resize', resize, { passive: true });
+
+            let running = true;
+            document.addEventListener('visibilitychange', () => { running = !document.hidden; if (running) requestAnimationFrame(animate); });
+
+            let last = performance.now();
+            function animate(t) {
+                if (!running) return; // pause when tab is inactive
+                const dt = (t - last) * 0.001;
+                last = t;
+                if (uniforms && uniforms.iTime) uniforms.iTime.value += dt;
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
+            }
+            requestAnimationFrame((t) => { last = t; animate(t); });
+        })();
+    </script>
 </body>
 
 </html>
