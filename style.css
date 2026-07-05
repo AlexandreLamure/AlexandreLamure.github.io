@@ -158,6 +158,13 @@ nav {
     border-color: #000000;
 }
 
+/* GitHub button */
+.btn-social.gh:hover {
+    background-color: #8534F3;
+    border-color: #8534F3;
+}
+
+
 /* Youtube button */
 .btn-social.yt:hover {
     background-color: var(--yt-red);
@@ -544,5 +551,125 @@ nav {
         width: 100%;
         height: 160px;
         flex: none;
+    }
+}
+
+/* Resume page */
+.resume-page {
+    max-width: 900px;
+    padding-bottom: 3rem;
+}
+
+.resume-card {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(10, 10, 10, 0.04);
+}
+
+.resume-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.resume-header h1 {
+    margin: 0 0 0.4rem;
+    font-size: clamp(1.7rem, 3vw, 2.3rem);
+}
+
+.resume-summary {
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin: 0 0 0.35rem;
+    color: #555;
+}
+
+.resume-socials {
+    margin-top: 0;
+    justify-content: flex-end;
+}
+
+.resume-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 0.7rem;
+}
+
+.resume-meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--gray);
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+.resume-section {
+    margin-bottom: 3rem;
+}
+
+.resume-section h2 {
+    font-size: 1rem;
+    margin: 0 0 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: #666;
+}
+
+.resume-item-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.resume-item p {
+    margin: 0;
+    margin-bottom: 2.5rem;
+    color: #444;
+}
+
+.resume-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.resume-skills span {
+    border: 1px solid var(--border);
+    background: var(--gray);
+    border-radius: 999px;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.95rem;
+}
+
+@media (max-width: 700px) {
+    .resume-card {
+        padding: 1.25rem;
+    }
+
+    .resume-header {
+        flex-direction: column;
+    }
+
+    .resume-contact {
+        align-items: flex-start;
+    }
+
+    .resume-item-head {
+        flex-direction: column;
+        gap: 0.15rem;
     }
 }
