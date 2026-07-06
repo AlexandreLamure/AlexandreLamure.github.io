@@ -369,7 +369,7 @@ nav {
     }
 }
 
-/* Background canvas for minimal three.js scene */
+/* Background canvas for WebGL2 shader */
 #bg-canvas {
     position: fixed;
     inset: 0;

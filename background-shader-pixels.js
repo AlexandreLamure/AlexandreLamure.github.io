@@ -1,4 +1,4 @@
-window.backgroundShaderSource = `
+window.backgroundShaderSource = `#version 300 es
 /*
 This shader is a minimalist, performant and animated background pattern, displayed on the background edges.
 */
@@ -7,6 +7,7 @@ precision mediump float;
 uniform float iTime;
 uniform vec2 iResolution;
 uniform vec3 u_bg;
+out vec4 fragColor;
 
 // vec2 to vec2 hash
 vec2 hash22(vec2 p) { 
@@ -50,5 +51,5 @@ void main() {
     const float globalFade = 0.4;
     color = mix(u_bg, color, vignette * topFade * globalFade); // blend with background color
 
-    gl_FragColor = vec4(u_bg, 1.0);
+    fragColor = vec4(u_bg, 1.0);
 }`;
