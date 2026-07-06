@@ -1,1 +1,2 @@
-My personal website, check it out [here](https://alexandrelamure.github.io/)! :)
+My personal website, check it out! :)
+<https://alexandrelamure.github.io/>
