@@ -2,12 +2,31 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stylized GGX shading — sharp specular highlights</title>
+    <meta name="description" content="Stylized GGX shading — sharp specular highlights.">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:url" content="https://alexandrelamure.github.io/graphics-posts/graphics-post-stylized-ggx-shading.html">
+    <meta property="og:title" content="Stylized GGX shading | Alexandre Lamure">
+    <meta property="og:description" content="Stylized GGX shading — sharp specular highlights.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://alexandrelamure.github.io/resources/profile-picture.jpg">
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Stylized GGX shading | Alexandre Lamure">
+    <meta name="twitter:description" content="Stylized GGX shading — sharp specular highlights.">
+    <meta name="twitter:image" content="https://alexandrelamure.github.io/resources/profile-picture.jpg">
+
+    <title>Stylized GGX shading | Alexandre Lamure</title>
+    <link rel="canonical" href="https://alexandrelamure.github.io/graphics-posts/graphics-post-stylized-ggx-shading.html">
     <link rel="stylesheet" href="../style.css">
     <link rel="icon" href="../resources/website-icon.jpg" type="image/jpeg">
-    <meta name="theme-color" content="#ffffff">
+    <link rel="apple-touch-icon" href="../resources/website-icon.jpg">
+    <link rel="manifest" href="../site.webmanifest">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Syntax highlighting -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs/plugins/keep-markup/prism-keep-markup.min.css">
@@ -30,7 +49,7 @@
     </header>
 
     <main class="content">
-        <p><a class="btn-small" href="../graphics.html">Back to graphics</a></p>
+        <p><a class="btn-small" href="../graphics.html"><i class="fas fa-arrow-left"></i>Back to graphics</a></p>
 
         <h1>Stylized GGX shading — sharp specular highlights</h1>
         <div class="graphics-post-date">June 21, 2026</div>
@@ -41,12 +60,12 @@ float Threshold = 0.0; // any value between 0 and 1
 vec3 Radiance = BRDF * LightIntensity * <strong>step</strong>(<strong>Threshold</strong>, dot(Normal, LightDirection));</code></pre>
 
         <div style="display:flex;gap:2rem;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin:1rem 0;margin-bottom:4rem;">
-            <figure style="margin:0;text-align:center;max-width:45%;">
-                <img src="../resources/graphics-posts/graphics-post-01/diffuse-thresholding.png" alt="Diffuse Thresholding" style="width:100%;height:auto;display:block;">
+            <figure style="margin:0;text-align:center;max-width:48%;">
+                <img src="../resources/graphics-posts/graphics-post-stylized-ggx-shading/diffuse-thresholding.png" alt="Diffuse Thresholding" style="width:100%;height:auto;display:block;">
                 <figcaption>Diffuse Thresholding</figcaption>
             </figure>
-            <figure style="margin:0;text-align:center;max-width:45%;">
-                <img src="../resources/graphics-posts/graphics-post-01/specular-thresholding.png" alt="Specular Thresholding" style="width:100%;height:auto;display:block;">
+            <figure style="margin:0;text-align:center;max-width:48%;">
+                <img src="../resources/graphics-posts/graphics-post-stylized-ggx-shading/specular-thresholding.png" alt="Specular Thresholding" style="width:100%;height:auto;display:block;">
                 <figcaption>Specular Thresholding</figcaption>
             </figure>
         </div>
@@ -54,14 +73,14 @@ vec3 Radiance = BRDF * LightIntensity * <strong>step</strong>(<strong>Threshold<
 
         <p>However, one might want to mix the 2D and 3D looks: <strong>big sharp highlights at low roughness</strong> and <strong>soft gradients at high roughness</strong>.
         It feels more modern than pure toon shading, and the bonus part is that we can rely on PBR for most of our shading, making everyone's lives easier. <br>
-        I'll call this mixed approach "Stylized GGX Shading".
+        I call this mixed approach "Stylized GGX Shading".
         </p>
         <div style="display:flex;gap:2rem;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin:1rem 0;margin-bottom:4rem;">
-            <figure style="margin:0;text-align:center;max-width:45%;">
+            <figure style="margin:0;text-align:center;max-width:48%;">
                 <img src="../resources/website-icon.jpg" alt="PBR GGX Shading" style="width:100%;height:auto;display:block;">
                 <figcaption>PBR GGX Shading</figcaption>
             </figure>
-            <figure style="margin:0;text-align:center;max-width:45%;">
+            <figure style="margin:0;text-align:center;max-width:48%;">
                 <img src="../resources/website-icon.jpg" alt="Stylized GGX Shading" style="width:100%;height:auto;display:block;">
                 <figcaption>Stylized GGX Shading</figcaption>
             </figure>
@@ -74,12 +93,12 @@ vec3 Radiance = BRDF * LightIntensity * <strong>step</strong>(<strong>Threshold<
         <p>
         Another example is <cite>Spellcasters Chronicles</cite>, which I had the chance to work on. During the development we tested many things, including this "Stylized GGX Shading" I'm describing here. In the end we landed on something else, but it still uses a mix of 2D and 3D looks. 
 
-        <div style="display:flex;gap:2rem;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin:1rem 0;">
-            <figure style="margin:0;text-align:center;max-width:45%;">
+        <div style="display:flex;gap:2rem;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin:1rem 0;margin-bottom:2rem;">
+            <figure style="margin:0;text-align:center;max-width:48%;">
                 <img src="https://assets.nintendo.com/image/upload/f_auto/q_auto/dpr_1.5/c_scale,w_900/ncom/en_US/articles/2023/the-final-legend-of-zelda-tears-of-the-kingdom-trailer-is-soaring-your-way/TotK_image3" alt="A screenshot from Zelda: Tears of the Kingdom" style="width:100%;height:auto;display:block;">
                 <figcaption>A screenshot from Zelda: Tears of the Kingdom</figcaption>
             </figure>
-            <figure style="margin:0;text-align:center;max-width:45%;">
+            <figure style="margin:0;text-align:center;max-width:48%;">
                 <img src="https://cdn.mos.cms.futurecdn.net/uhzhtgEtgwNjqC9sxcrDhM.jpg" alt="A screenshot from Spellcasters Chronicles" style="width:100%;height:auto;display:block;">
                 <figcaption>A screenshot from Spellcasters Chronicles</figcaption>
             </figure>
@@ -129,12 +148,12 @@ float D(vec3 Normal, vec3 HalfVector, float Roughness, float SpecularSize)
             In ordinate, we have the NDF value (the <code>return</code> value). Higher means more reflected energy. <br>
             <b style="color:black;">Black curve</b> is the original Trowbridge-Reitz NDF, <b style="color:red;">red curve</b> is the stylized one. <br>
             Our new "Specular Size" parameter allows to return more energy at higher angles while preserving the original shape of the NDF. <br> 
-            <div style="display:flex; gap:2rem; justify-content:center; align-items:flex-start; flex-wrap:wrap; margin:2rem 0; margin-bottom:4rem;">
-                <figure style="margin:0; flex:1 1 320px; max-width:480px; text-align:center;">
+            <div style="display:flex; gap:2rem; justify-content:center; align-items:flex-start; flex-wrap:wrap; margin:1rem 0; margin-bottom:4rem;">
+                <figure style="margin:0; flex:1 1; max-width:48%; text-align:center;">
                     <iframe src="https://www.desmos.com/calculator/jnt2ph0v2g?embed" style="width:100%; height:360px; border:1px solid #ddd; border-radius:4px; background:#fff; display:block;" frameborder="0"></iframe>
                     <figcaption style="margin-top:0.6rem; font-size:0.95rem; color:#555;">Desmos graph animating the Specular Size</figcaption>
                 </figure>
-                <figure style="margin:0; flex:1 1 320px; max-width:480px; text-align:center;">
+                <figure style="margin:0; flex:1 1; max-width:48%; text-align:center;">
                     <img src="../resources/website-icon.jpg" alt="Specular Thresholding" style="width:100%; height:360px; object-fit:cover; display:block; border:1px solid #ddd; border-radius:4px;">
                     <figcaption style="margin-top:0.6rem; font-size:0.95rem; color:#555;">Resulting highlight shape</figcaption>
                 </figure>
@@ -189,7 +208,7 @@ float D(vec3 Normal, vec3 HalfVector, float Roughness, float SpecularSize, float
 
         </p>
 
-        <p><a class="btn-small" href="../graphics.html">Back to graphics</a></p>
+        <p><a class="btn-small" href="../graphics.html"><i class="fas fa-arrow-left"></i>Back to graphics</a></p>
     </main>
 </body>
 
