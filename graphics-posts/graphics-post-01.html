@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stylized GGX shading — sharp specular highlights</title>
     <link rel="stylesheet" href="../style.css">
-    <link rel="icon" href="../resources/website-icon.jpg" type="image/jpg">
+    <link rel="icon" href="../resources/website-icon.jpg" type="image/jpeg">
     <meta name="theme-color" content="#ffffff">
     <!-- Syntax highlighting -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
@@ -33,14 +33,14 @@
         <p><a class="btn-small" href="../graphics.html">Back to graphics</a></p>
 
         <h1>Stylized GGX shading — sharp specular highlights</h1>
-        <div class="post-date">June 21, 2026</div>
+        <div class="graphics-post-date">June 21, 2026</div>
         <p>To achieve a toon look in 3D rendering, the most common way is to threshold the lighting. It transforms the soft color gradients color gradients into flat colors.</p>
 
         <pre><code class="language-glsl">// The rendering equation becomes:
 float Threshold = 0.0; // any value between 0 and 1
 vec3 Radiance = BRDF * LightIntensity * <strong>step</strong>(<strong>Threshold</strong>, dot(Normal, LightDirection));</code></pre>
 
-        <div class="image-row" style="display:flex;gap:2rem;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin:1rem 0;margin-bottom:4rem;">
+        <div style="display:flex;gap:2rem;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin:1rem 0;margin-bottom:4rem;">
             <figure style="margin:0;text-align:center;max-width:45%;">
                 <img src="../resources/graphics-posts/graphics-post-01/diffuse-thresholding.png" alt="Diffuse Thresholding" style="width:100%;height:auto;display:block;">
                 <figcaption>Diffuse Thresholding</figcaption>
@@ -56,7 +56,7 @@ vec3 Radiance = BRDF * LightIntensity * <strong>step</strong>(<strong>Threshold<
         It feels more modern than pure toon shading, and the bonus part is that we can rely on PBR for most of our shading, making everyone's lives easier. <br>
         I'll call this mixed approach "Stylized GGX Shading".
         </p>
-        <div class="image-row" style="display:flex;gap:2rem;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin:1rem 0;margin-bottom:4rem;">
+        <div style="display:flex;gap:2rem;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin:1rem 0;margin-bottom:4rem;">
             <figure style="margin:0;text-align:center;max-width:45%;">
                 <img src="../resources/website-icon.jpg" alt="PBR GGX Shading" style="width:100%;height:auto;display:block;">
                 <figcaption>PBR GGX Shading</figcaption>
@@ -74,7 +74,7 @@ vec3 Radiance = BRDF * LightIntensity * <strong>step</strong>(<strong>Threshold<
         <p>
         Another example is <cite>Spellcasters Chronicles</cite>, which I had the chance to work on. During the development we tested many things, including this "Stylized GGX Shading" I'm describing here. In the end we landed on something else, but it still uses a mix of 2D and 3D looks. 
 
-        <div class="image-row" style="display:flex;gap:2rem;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin:1rem 0;">
+        <div style="display:flex;gap:2rem;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin:1rem 0;">
             <figure style="margin:0;text-align:center;max-width:45%;">
                 <img src="https://assets.nintendo.com/image/upload/f_auto/q_auto/dpr_1.5/c_scale,w_900/ncom/en_US/articles/2023/the-final-legend-of-zelda-tears-of-the-kingdom-trailer-is-soaring-your-way/TotK_image3" alt="A screenshot from Zelda: Tears of the Kingdom" style="width:100%;height:auto;display:block;">
                 <figcaption>A screenshot from Zelda: Tears of the Kingdom</figcaption>

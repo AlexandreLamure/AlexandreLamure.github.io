@@ -71,8 +71,7 @@ nav {
 }
 
 /* Page-specific width override */
-.wide-page,
-.wide-content {
+.wide-page {
     max-width: 1400px;
 }
 
@@ -202,14 +201,18 @@ nav {
     border-bottom-color: var(--sc-orange);
 }
 
-.page-intro p {
-    font-size: 1.1rem;
-    line-height: 1.8;
-}
-
-.post-date {
+.music-post-date {
     color: #666666;
     font-size: 0.9rem;
+}
+
+.music-post-title {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+.music-post-separator {
+    margin-top: 1rem;
     margin-bottom: 1rem;
 }
 
@@ -260,8 +263,7 @@ nav {
 }
 
 /* 7. Teaching Grid & Projects */
-.teaching-grid,
-.grid {
+.teaching-grid {
     display: grid;
     gap: 80px;
     margin-top: 2rem;
@@ -269,11 +271,6 @@ nav {
 
 .teaching-grid {
     grid-template-columns: 1fr 1fr;
-}
-
-.grid {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
 }
 
 .course-column {
@@ -354,8 +351,7 @@ nav {
         padding-bottom: 40px;
     }
 
-    .wide-page,
-    .wide-content {
+    .wide-page {
         max-width: 800px;
     }
 
@@ -400,9 +396,6 @@ nav {
     flex-wrap: wrap;
     /* enforce identical horizontal and vertical spacing */
     gap: 42px;
-    /* fallback for older browsers */
-    column-gap: 42px;
-    row-gap: 42px;
     align-content: flex-start;
     justify-content: center;
     margin-top: 1rem;
@@ -486,14 +479,14 @@ nav {
 }
 
 /* Simple blog post list styles (kept minimal & consistent) */
-.post-list {
+.graphics-post-list {
     display: flex;
     flex-direction: column;
     gap: 1rem;
     margin-top: 1rem;
 }
 
-.post-item {
+.graphics-post-item {
     display: flex;
     gap: 1rem;
     align-items: flex-start;
@@ -506,12 +499,12 @@ nav {
     transition: box-shadow 0.18s ease, transform 0.12s ease;
 }
 
-.post-item:hover {
+.graphics-post-item:hover {
     box-shadow: 0 8px 24px rgba(10,10,10,0.06);
     transform: translateY(-3px);
 }
 
-.post-thumb {
+.graphics-post-thumb {
     width: 160px;
     height: 100px;
     object-fit: cover;
@@ -520,34 +513,34 @@ nav {
     border: 1px solid var(--border);
 }
 
-.post-content {
+.graphics-post-content {
     flex: 1 1 auto;
 }
 
-.post-title {
+.graphics-post-title {
     font-weight: 700;
     font-size: 1.05rem;
     margin-bottom: 4px;
 }
 
-.post-date {
+.graphics-post-date {
     color: #666666;
     font-size: 0.9rem;
     margin-bottom: 8px;
 }
 
-.post-excerpt {
+.graphics-post-excerpt {
     margin: 0;
     color: #222222;
 }
 
 @media (max-width: 600px) {
-    .post-item {
+    .graphics-post-item {
         flex-direction: column;
         align-items: stretch;
     }
 
-    .post-thumb {
+    .graphics-post-thumb {
         width: 100%;
         height: 160px;
         flex: none;
@@ -662,10 +655,6 @@ nav {
 
     .resume-header {
         flex-direction: column;
-    }
-
-    .resume-contact {
-        align-items: flex-start;
     }
 
     .resume-item-head {

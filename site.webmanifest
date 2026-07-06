@@ -9,12 +9,12 @@
     {
       "src": "resources/website-icon.jpg",
       "sizes": "240x240",
-      "type": "image/jpg"
+      "type": "image/jpeg"
     },
     {
       "src": "resources/profile-picture.jpg",
       "sizes": "1000x1000",
-      "type": "image/jpg"
+      "type": "image/jpeg"
     }
   ]
 }
