@@ -6,14 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Resume of Alexandre Lamure, software engineer focused on computer graphics and machine learning.">
     <meta name="theme-color" content="#ffffff">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:url" content="https://alexandrelamure.github.io/resume.html">
     <meta property="og:title" content="Resume | Alexandre Lamure">
     <meta property="og:description" content="Resume of Alexandre Lamure, software engineer focused on computer graphics and machine learning.">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="resources/profile-picture.jpg">
+    <meta property="og:image" content="https://alexandrelamure.github.io/resources/profile-picture.jpg">
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Resume | Alexandre Lamure">
     <meta name="twitter:description" content="Resume of Alexandre Lamure, software engineer focused on computer graphics and machine learning.">
+    <meta name="twitter:image" content="https://alexandrelamure.github.io/resources/profile-picture.jpg">
+
     <title>Resume | Alexandre Lamure</title>
+    <link rel="canonical" href="https://alexandrelamure.github.io/resume.html">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="icon" href="resources/website-icon.jpg" type="image/jpeg">
@@ -196,16 +203,9 @@
                 u_bg: { value: new Color(cssBg) }
             };
 
-            let material = null;
-            let mesh = null;
-
-            function createMaterialFromSource(src) {
-                material = new ShaderMaterial({ uniforms, vertexShader: 'void main(){ gl_Position = vec4(position, 1.0); }', fragmentShader: src });
-                mesh = new Mesh(geometry, material);
-                scene.add(mesh);
-            }
-
-            createMaterialFromSource(shaderSource);
+            let material = new ShaderMaterial({ uniforms, vertexShader: 'void main(){ gl_Position = vec4(position, 1.0); }', fragmentShader: shaderSource });
+            let mesh = new Mesh(geometry, material);
+            scene.add(mesh);
 
             function resize() {
                 const w = window.innerWidth, h = window.innerHeight;
