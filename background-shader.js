@@ -1,6 +1,6 @@
 window.backgroundShaderSource = `#version 300 es
 /*
-This shader is a minimalist, performant and animated background pattern, displayed on the background edges.
+Shader for a minimalist & performant animated pattern, displayed on the background.
 */
 
 precision mediump float;

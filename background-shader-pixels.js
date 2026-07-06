@@ -1,6 +1,6 @@
 window.backgroundShaderSource = `#version 300 es
 /*
-This shader is a minimalist, performant and animated background pattern, displayed on the background edges.
+Shader for a minimalist & performant animated pattern, displayed on the background.
 */
 
 precision mediump float;
@@ -9,47 +9,44 @@ uniform vec2 iResolution;
 uniform vec3 u_bg;
 out vec4 fragColor;
 
-// vec2 to vec2 hash
-vec2 hash22(vec2 p) { 
-    float n = sin(dot(p, vec2(41, 289)));
-    p = fract(vec2(262144, 32768)*n); 
-    return sin( p*6.2831853 + iTime )*.45 + .5; 
-}
-
-// 3D noise, inspired by Xor's "Dot Noise" ShaderToy (https://www.shadertoy.com/view/wfsyRX).
-float DotNoise(vec3 p)
+float hash21(vec2 p)
 {
-    //The golden ratio:
-    //https://mini.gmshaders.com/p/phi
-    const float PHI = 1.618033988;
-    //Rotating the golden angle on the vec3(1, phi, phi*phi) axis
-    const mat3 GOLD = mat3(
-    -0.571464913, +0.814921382, +0.096597072,
-    -0.278044873, -0.303026659, +0.911518454,
-    +0.772087367, +0.494042493, +0.399753815);
-    
-    //Gyroid with irrational orientations and scales
-    float noise = dot(cos(GOLD * p), sin(PHI * p * GOLD)); //Ranges from [-3 to +3]
-    return noise / 6.0 + 0.5; //Remap to [0 to 1]
+    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
 }
 
 void main() {
-    vec2 uv = gl_FragCoord.xy / iResolution.xy;
-    vec2 p = uv - 0.5;
-    float t = iTime * 0.1;
+    vec2 uv = gl_FragCoord.xy / iResolution;
 
-    // Dot Noise
-    const float DotNoiseScale = 16.0;
-    float dotNoise = DotNoise(vec3(uv, t) * DotNoiseScale);
+    // Horizontal band, soft vertical fade
+    const float bandY = 0.45;
+    const float bandH = 0.32;
+    const float bandFade = 0.36;
+    float band = smoothstep(bandY - bandH, bandY - bandH + bandFade, uv.y)
+               * smoothstep(bandY + bandH, bandY + bandH - bandFade, uv.y);
 
-    // Combine
-    vec3 color = vec3(dotNoise);
+    // Big square pixels (screen-space grid)
+    const float cellPx = 12.0;
+    vec2 cell = floor(gl_FragCoord.xy / cellPx);
 
-    // Fade out
-    float vignette = smoothstep(0.17, 0.75, length(p - vec2(0.0, 0.1)));
-    float topFade = smoothstep(1.0, 0.5, uv.y);
-    const float globalFade = 0.4;
-    color = mix(u_bg, color, vignette * topFade * globalFade); // blend with background color
+    // Slow wave, mixed with per-cell variation
+    const float waveIntensity = 0.4;
+    const float waveSpeed = 0.2;
+    const float waveFrequency = 0.05;
+    const float waveNoise = 0.4;
+    float waveDirection = mix(cell.x, -cell.y, 0.7);
+    float wave = mix(1.0, sin(waveDirection * waveFrequency - iTime * waveSpeed), waveIntensity);
+    float shade = mix(wave, hash21(cell), waveNoise);
 
-    fragColor = vec4(u_bg, 1.0);
+    // Map to white (invisible) → light grey only
+    const float greyMin = 0.86;
+    float grey = mix(greyMin, 1.0, shade);
+    float vis = band * (1.0 - grey) / (1.0 - greyMin);
+
+    // Very light stroboscopic fade: each cell blinks on its own slow random cycle
+    float strobeT = fract(iTime * mix(0.10, 0.16, hash21(cell + 29.3)) + hash21(cell + 53.7));
+    float strobe = smoothstep(0.0, 0.18, strobeT) * (1.0 - smoothstep(0.62, 0.82, strobeT));
+    vis *= strobe;
+
+    fragColor = vec4(mix(u_bg, vec3(grey), vis), 1.0);
 }`;
+
