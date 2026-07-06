@@ -75,9 +75,9 @@ void main() {
                * smoothstep(bandY + bandH, bandY + bandH - bandFade, uv.y);
 
     // Fades
-    float vignette = clamp(0.1 + smoothstep(0.15, 0.72, length(uv - 0.5)), 0.0, 1.0);
-    float edgeFade = clamp(0.1 + smoothstep(0.0, 0.13, uv.x) * smoothstep(1.0, 0.87, uv.x), 0.0, 1.0);
-    const float globalIntensity = 1.3;
+    float vignette = clamp(0.05 + smoothstep(0.15, 0.72, length(uv - 0.5)), 0.0, 1.0);
+    float edgeFade = clamp(0.1 + smoothstep(0.0, 0.15, uv.x) * smoothstep(1.0, 0.85, uv.x), 0.0, 1.0);
+    const float globalIntensity = 0.9;
     float vis = band * vignette * edgeFade * globalIntensity * smoothstep(0.18, 0.82, field);
 
     fragColor = vec4(mix(u_bg, waveColor, vis), 1.0);
