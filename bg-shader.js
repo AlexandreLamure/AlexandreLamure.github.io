@@ -87,7 +87,7 @@ void main() {
         resize();
         window.addEventListener('resize', resize, { passive: true });
 
-        let time = 0;
+        let time = Math.random() * 120;
         let last = performance.now();
         let running = true;
 

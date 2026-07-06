@@ -29,6 +29,7 @@
 </head>
 
 <body>
+    <canvas id="bg-canvas"></canvas>
     <header>
         <nav>
             <div class="logo">Alexandre Lamure</div>
@@ -1160,6 +1161,19 @@
         </article>
 
     </main>
+
+    <!-- Import background shader -->
+    <script src="background-shader-colorwaves.js"></script>
+    <script src="bg-shader.js"></script>
+    <!-- Run background shader -->
+    <script>
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            startBackgroundShader(
+                document.getElementById('bg-canvas'),
+                window.backgroundShaderSource
+            );
+        }
+    </script>
 </body>
 
 </html>
