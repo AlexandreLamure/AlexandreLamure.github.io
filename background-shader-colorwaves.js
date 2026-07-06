@@ -9,6 +9,11 @@ uniform vec2 iResolution;
 uniform vec3 u_bg;
 out vec4 fragColor;
 
+float map(float value, float min1, float max1, float min2, float max2)
+{
+  return min2 + (value - min1) * (max2 - min2) / (max1 - min1);
+}
+
 float hash21(vec2 p)
 {
     return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
@@ -41,11 +46,19 @@ float fbm(vec2 p)
 
 vec3 palette(float t)
 {
-    vec3 a = vec3(0.52, 0.48, 0.55);
-    vec3 b = vec3(0.48, 0.50, 0.45);
-    vec3 c = vec3(1.0, 0.85, 0.65);
-    vec3 d = vec3(0.00, 0.28, 0.58);
-    return a + b * cos(6.28318 * (c * t + d));
+    // Restrained warm pastels: mostly red → orange → yellow, hints of pink & brown
+    vec3 cream  = vec3(0.98, 0.94, 0.90);
+    vec3 red    = vec3(0.97, 0.82, 0.78);
+    vec3 orange = vec3(0.99, 0.90, 0.80);
+    vec3 yellow = vec3(0.99, 0.96, 0.88);
+
+    t = fract(t);
+    vec3 col = cream;
+    const float saturation = 0.1;
+    col = mix(col, red,    clamp(saturation + smoothstep(0.00, 0.20, t) * (1.0 - smoothstep(0.20, 0.38, t)), 0.0, 1.0));
+    col = mix(col, orange, clamp(saturation + smoothstep(0.38, 0.57, t) * (1.0 - smoothstep(0.57, 0.72, t)), 0.0, 1.0));
+    col = mix(col, yellow, clamp(saturation + smoothstep(0.72, 0.88, t) * (1.0 - smoothstep(0.88, 1.0, t)), 0.0, 1.0));
+    return col;
 }
 
 void main() {
@@ -75,9 +88,9 @@ void main() {
                * smoothstep(bandY + bandH, bandY + bandH - bandFade, uv.y);
 
     // Fades
-    float vignette = clamp(0.05 + smoothstep(0.15, 0.72, length(uv - 0.5)), 0.0, 1.0);
-    float edgeFade = clamp(0.1 + smoothstep(0.0, 0.15, uv.x) * smoothstep(1.0, 0.85, uv.x), 0.0, 1.0);
-    const float globalIntensity = 0.9;
+    float vignette = clamp(0.7 + smoothstep(0.15, 0.72, length(uv - 0.5)), 0.0, 1.0);
+    float edgeFade = clamp(0.8 + smoothstep(0.0, 0.15, uv.x) * smoothstep(1.0, 0.85, uv.x), 0.0, 1.0);
+    const float globalIntensity = 1.2;
     float vis = band * vignette * edgeFade * globalIntensity * smoothstep(0.18, 0.82, field);
 
     fragColor = vec4(mix(u_bg, waveColor, vis), 1.0);
