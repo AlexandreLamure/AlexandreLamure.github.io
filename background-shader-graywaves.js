@@ -57,12 +57,11 @@ void main() {
         fbm(p + vec2(0.0, iTime * 0.04)),
         fbm(p + vec2(4.7, 1.9) - iTime * 0.03)
     );
-    float smoke = fbm(p + 2.8 * warp);
-    float wisps = fbm(p * 1.6 - warp * 1.4 + vec2(flow * 0.3, 0.0));
-
-    float field = mix(smoke, wisps, 0.45);
-    float wave = field + flow * 0.18 + wisps * 0.25;
-    wave = map(wave, 0.0, 1.0, 0.87, 0.93);
+    float smoke1 = fbm(p + 2.8 * warp);
+    float smoke2 = fbm(p * 1.6 - warp * 1.4 + vec2(flow * 0.3, 0.0));
+    float smoke = mix(smoke1, smoke2, 0.45);
+    const float smokeBlur = 0.28; // increase to make the smoke more diffuse
+    smoke = smoothstep(0.5-smokeBlur, 0.5+smokeBlur, smoke);
 
     // Horizontal band, soft vertical fade
     const float bandY = 0.45;
@@ -74,8 +73,8 @@ void main() {
     // Fades
     float vignette = clamp(0.7 + smoothstep(0.15, 0.72, length(uv - 0.5)), 0.0, 1.0);
     float edgeFade = clamp(0.8 + smoothstep(0.0, 0.15, uv.x) * smoothstep(1.0, 0.85, uv.x), 0.0, 1.0);
-    const float globalIntensity = 1.2;
-    float vis = band * vignette * edgeFade * globalIntensity * smoothstep(0.18, 0.82, field);
+    const float globalFade = 0.22;
+    float vis = band * vignette * edgeFade * globalFade;
 
-    fragColor = vec4(mix(u_bg, vec3(wave), vis), 1.0);
+    fragColor = vec4(mix(u_bg, vec3(smoke), vis), 1.0);
 }`;
