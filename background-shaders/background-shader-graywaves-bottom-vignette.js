@@ -49,7 +49,7 @@ void main() {
 
     // Flow from top-left toward bottom-right
     const float flowSpeed = 0.07;
-    float flow = dot(uv, vec2(1.0, 1.0)) - iTime * flowSpeed;
+    float flow = uv.y - iTime * flowSpeed;
     vec2 p = uv * 2.4 + vec2(flow * 0.0, flow * 0.75);
 
     // Domain warp for fluid-like animation
@@ -64,8 +64,8 @@ void main() {
     smoke = smoothstep(0.5-smokeBlur, 0.5+smokeBlur, smoke);
 
     // Fades
-    float vignette = smoothstep(0.1, 0.72, length(uv - 0.5));
-    float topFade = smoothstep(0.95, 0.35, uv.y);
+    float vignette = smoothstep(0.18, 0.72, length(uv - 0.5));
+    float topFade = smoothstep(0.92, 0.30, uv.y);
     const float globalFade = 0.30;
     float vis = vignette * topFade * globalFade;
 
