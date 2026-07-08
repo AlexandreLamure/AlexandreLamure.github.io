@@ -242,6 +242,28 @@ nav {
     left: 0;
     width: 100%;
     height: 100%;
+    border: none;
+}
+
+.embed-soundcloud {
+    width: 100%;
+    height: 166px;
+    border: none;
+    display: block;
+}
+
+.embed-youtube {
+    border: none;
+}
+
+/* Tight stacks of YouTube embeds inside a media container */
+.media-container:has(.video-wrapper + .video-wrapper) .video-wrapper {
+    margin: 0.1rem 0 0;
+}
+
+/* Main video before a group of variant embeds */
+.media-container:has(> .video-wrapper:only-child):has(+ .media-container > .video-wrapper) > .video-wrapper {
+    margin-bottom: 1rem;
 }
 
 .media-container {
