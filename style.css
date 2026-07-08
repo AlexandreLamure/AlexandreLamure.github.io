@@ -198,6 +198,18 @@ nav {
     border-bottom-color: var(--sc-orange);
 }
 
+/* Profile Images */
+.profile-img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    /* Makes the image circular */
+    object-fit: cover;
+    margin-bottom: 1.0rem;
+    border: 3px solid var(--gray);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
 .music-post-date {
     color: #666666;
     font-size: 0.9rem;
@@ -213,18 +225,6 @@ nav {
     margin-bottom: 1rem;
 }
 
-/* Profile Images */
-.profile-img {
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    /* Makes the image circular */
-    object-fit: cover;
-    margin-bottom: 1.0rem;
-    border: 3px solid var(--gray);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
 /* 6. Media & Video Wrappers (16:9) */
 .video-wrapper {
     position: relative;
@@ -233,44 +233,35 @@ nav {
     overflow: hidden;
     border-radius: 8px;
     background: #000;
-    margin: 1.5rem 0;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .video-wrapper iframe {
     position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
     height: 100%;
-    border: none;
 }
 
 .embed-soundcloud {
     width: 100%;
-    height: 166px;
     border: none;
-    display: block;
+    margin-bottom: 0.5rem;
 }
 
 .embed-youtube {
+    margin-bottom: 1rem;
     border: none;
 }
 
-/* Tight stacks of YouTube embeds inside a media container */
-.media-container:has(.video-wrapper + .video-wrapper) .video-wrapper {
-    margin: 0.1rem 0 0;
-}
-
-/* Main video before a group of variant embeds */
+/* Main video before a group of variant embeds */ /* TODO: Find a simpler way to do this, like for soundcloud */
 .media-container:has(> .video-wrapper:only-child):has(+ .media-container > .video-wrapper) > .video-wrapper {
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
 }
 
 .media-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-    gap: 1rem;
+    gap: 0.5rem;
     align-items: start;
 }
 
