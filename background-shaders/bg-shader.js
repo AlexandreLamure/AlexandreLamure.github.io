@@ -39,8 +39,30 @@ void main() {
         return [1, 1, 1];
     }
 
+    function ensureShaderLayer(canvas) {
+        const parent = canvas.parentElement;
+        if (parent && parent.id === 'bg-shader-layer') {
+            return parent;
+        }
+        const layer = document.createElement('div');
+        layer.id = 'bg-shader-layer';
+        canvas.parentNode.insertBefore(layer, canvas);
+        layer.appendChild(canvas);
+        return layer;
+    }
+
     window.startBackgroundShader = function (canvas, fragmentSource) {
-        const gl = canvas.getContext('webgl2', { antialias: false, alpha: false });
+        if (!canvas) {
+            return null;
+        }
+
+        ensureShaderLayer(canvas);
+
+        const gl = canvas.getContext('webgl2', {
+            antialias: false,
+            alpha: false,
+            desynchronized: true
+        });
         if (!gl) {
             return null;
         }

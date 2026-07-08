@@ -18,6 +18,7 @@ body {
     background: var(--bg);
     margin: 0;
     padding: 0;
+    isolation: isolate;
 }
 
 /* 2. Navigation (Standard PC Layout) */
@@ -387,19 +388,31 @@ nav {
     }
 }
 
-/* Background canvas for WebGL2 shader */
-#bg-canvas {
+/* Background shader layer (fixed on wrapper, not canvas — avoids Chrome compositor ghosting) */
+#bg-shader-layer {
     position: fixed;
     inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+#bg-canvas {
+    display: block;
     width: 100%;
     height: 100%;
-    z-index: -1;
-    pointer-events: none;
-    opacity: 1;
+}
+
+/* Promote page content above the shader into its own compositor layer */
+body > :not(#bg-shader-layer) {
+    position: relative;
+    z-index: 1;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
 }
 
 @media (prefers-reduced-motion: reduce) {
-    #bg-canvas {
+    #bg-shader-layer {
         display: none;
     }
 }
