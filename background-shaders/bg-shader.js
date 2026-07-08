@@ -16,6 +16,12 @@ void main() {
     fragColor = vec4(u_bg, 1.0);
 }`;
 
+    const DEFAULT_OPTIONS = {
+        renderScale: 0.5,
+        maxFps: 45,
+        maxDpr: 1.5
+    };
+
     function compileShader(gl, type, source) {
         const shader = gl.createShader(type);
         gl.shaderSource(shader, source);
@@ -51,21 +57,29 @@ void main() {
         return layer;
     }
 
-    window.startBackgroundShader = function (canvas, fragmentSource) {
+    window.startBackgroundShader = function (canvas, fragmentSource, options) {
         if (!canvas) {
             return null;
         }
+
+        const settings = Object.assign({}, DEFAULT_OPTIONS, options || {});
+        const frameInterval = 1000 / settings.maxFps;
 
         ensureShaderLayer(canvas);
 
         const gl = canvas.getContext('webgl2', {
             antialias: false,
             alpha: false,
-            desynchronized: true
+            desynchronized: true,
+            powerPreference: 'low-power'
         });
         if (!gl) {
             return null;
         }
+
+        gl.disable(gl.DEPTH_TEST);
+        gl.disable(gl.CULL_FACE);
+        gl.disable(gl.BLEND);
 
         const program = gl.createProgram();
         try {
@@ -98,24 +112,29 @@ void main() {
         gl.uniform3fv(uBg, parseCssBgColor(cssBg));
 
         function resize() {
-            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const dpr = Math.min(window.devicePixelRatio || 1, settings.maxDpr);
+            const scale = settings.renderScale;
             const w = window.innerWidth;
             const h = window.innerHeight;
-            canvas.width = w * dpr;
-            canvas.height = h * dpr;
+            canvas.width = Math.max(1, Math.floor(w * dpr * scale));
+            canvas.height = Math.max(1, Math.floor(h * dpr * scale));
             gl.viewport(0, 0, canvas.width, canvas.height);
-            gl.uniform2f(uResolution, w, h);
+            gl.uniform2f(uResolution, w * scale, h * scale);
         }
         resize();
         window.addEventListener('resize', resize, { passive: true });
 
         let time = Math.random() * 120;
-        let last = performance.now();
+        let lastTime = performance.now();
+        let lastDraw = 0;
         let running = true;
 
         document.addEventListener('visibilitychange', function () {
             running = !document.hidden;
             if (running) {
+                const now = performance.now();
+                lastTime = now;
+                lastDraw = now;
                 requestAnimationFrame(tick);
             }
         });
@@ -124,15 +143,23 @@ void main() {
             if (!running) {
                 return;
             }
-            time += (t - last) * 0.001;
-            last = t;
+
+            if (t - lastDraw < frameInterval) {
+                requestAnimationFrame(tick);
+                return;
+            }
+            lastDraw = t;
+
+            time += (t - lastTime) * 0.001;
+            lastTime = t;
             gl.uniform1f(uTime, time);
             gl.drawArrays(gl.TRIANGLES, 0, 3);
             requestAnimationFrame(tick);
         }
 
         requestAnimationFrame(function (t) {
-            last = t;
+            lastTime = t;
+            lastDraw = t;
             tick(t);
         });
 

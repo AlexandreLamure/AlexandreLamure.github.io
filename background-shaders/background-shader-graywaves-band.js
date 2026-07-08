@@ -9,11 +9,6 @@ uniform vec2 iResolution;
 uniform vec3 u_bg;
 out vec4 fragColor;
 
-float map(float value, float min1, float max1, float min2, float max2)
-{
-  return min2 + (value - min1) * (max2 - min2) / (max1 - min1);
-}
-
 float hash21(vec2 p)
 {
     return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
@@ -65,8 +60,8 @@ void main() {
 
     // Horizontal band, soft vertical fade
     const float bandY = 0.45;
-    const float bandH = 0.4;
-    const float bandFade = 0.3;
+    const float bandH = 0.35;
+    const float bandFade = 0.25;
     float band = smoothstep(bandY - bandH, bandY - bandH + bandFade, uv.y)
                * smoothstep(bandY + bandH, bandY + bandH - bandFade, uv.y);
 
