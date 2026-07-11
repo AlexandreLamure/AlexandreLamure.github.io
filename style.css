@@ -1,6 +1,6 @@
 /* 1. Variables & Global Reset */
 :root {
-    --bg: #fcfafa;
+    --bg: #fcfbfa;
     --text: #1a1a1a;
     --accent: #0070f3;
     --gray: #f4f4f4;
@@ -300,6 +300,7 @@ nav {
     flex-wrap: wrap;
     gap: 10px;
     margin-top: 1rem;
+    margin-bottom: 1rem;
 }
 
 /* 8. Profile Grid for Index Page */

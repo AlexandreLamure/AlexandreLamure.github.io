@@ -154,7 +154,7 @@ float D(vec3 Normal, vec3 HalfVector, float Roughness, float SpecularSize)
                     <figcaption style="margin-top:0.6rem; font-size:0.95rem; color:#555;">Desmos graph animating the Specular Size</figcaption>
                 </figure>
                 <figure style="margin:0; flex:1 1; max-width:48%; text-align:center;">
-                    <img src="../resources/graphics-posts/graphics-post-stylized-ggx-shading/varying-specular-size.jpg" alt="Specular Thresholding" style="width:100%; height:360px; object-fit:cover; display:block; border:1px solid #ddd; border-radius:4px;">
+                    <img src="../resources/graphics-posts/graphics-post-stylized-ggx-shading/varying-specular-size.jpg" alt="Varying Specular Size" style="width:100%; height:360px; object-fit:cover; display:block; border:1px solid #ddd; border-radius:4px;">
                     <figcaption style="margin-top:0.6rem; font-size:0.95rem; color:#555;">Resulting highlight shape</figcaption>
                 </figure>
             </div>
@@ -177,7 +177,6 @@ float D(vec3 Normal, vec3 HalfVector, float Roughness, float SpecularSize, float
     return a2 / (PI * denom * denom);
 }</code></pre>
 
-
             <figure style="margin:0;margin-bottom:3rem;text-align:center;">
                 <img src="../resources/graphics-posts/graphics-post-stylized-ggx-shading/ggx-vs-simple-vs-improved-NDF.jpg" alt="Improved Stylized GGX Trowbridge-Reitz NDF" style="width:100%;height:auto;display:block;margin-top:0.5rem;">
                 <figcaption>Improved Stylized GGX Trowbridge-Reitz NDF. <br>The last three columns match better the original GGX energy distribution.</figcaption>
@@ -190,16 +189,6 @@ float D(vec3 Normal, vec3 HalfVector, float Roughness, float SpecularSize, float
                 <iframe src="https://www.desmos.com/calculator/gvbvdlsjas?embed" style="width:100%; height:360px; border:1px solid #ddd; border-radius:4px; background:#fff; display:block;" frameborder="0"></iframe>
                 <figcaption style="margin-top:0.6rem; font-size:0.95rem; color:#555;">Desmos graph animating the roughness</figcaption>
             </figure>
-
-        </p>
-
-
-        <h2>With other toon features</h2>
-        <p>Blablabla
-
-            Rim light ? Kuwahara ?
-            Also, clamp the stylized for bloom
-
         </p>
 
         <p><a class="btn-small" href="../graphics.html"><i class="fas fa-arrow-left"></i>Back to graphics</a></p>
