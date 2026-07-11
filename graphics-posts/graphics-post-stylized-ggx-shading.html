@@ -123,8 +123,8 @@ float D(vec3 Normal, vec3 HalfVector, float Roughness)
 }</code></pre>
 
             <figure style="margin:0;margin-bottom:3rem;text-align:center;">
-                <img src="../resources/website-icon.jpg" alt="GGX Trowbridge-Reitz NDF result" style="width:100%;height:auto;display:block;">
-                <figcaption>GGX Trowbridge-Reitz NDF result</figcaption>
+                <img src="../resources/graphics-posts/graphics-post-stylized-ggx-shading/ggx-NDF.jpg" alt="GGX Trowbridge-Reitz NDF result" style="width:100%;height:auto;display:block;margin-top:0.5rem;">
+                <figcaption>GGX Trowbridge-Reitz NDF, at varying roughness</figcaption>
             </figure>
 
             By slightly modifying this equation, we can expand the specular highlights.
@@ -139,8 +139,8 @@ float D(vec3 Normal, vec3 HalfVector, float Roughness, float SpecularSize)
     return a2 / (PI * denom * denom);
 }</code></pre>
             <figure style="margin:0;margin-bottom:3rem;text-align:center;">
-                <img src="../resources/website-icon.jpg" alt="Stylized GGX Trowbridge-Reitz NDF result" style="width:100%;height:auto;display:block;">
-                <figcaption>Stylized GGX Trowbridge-Reitz NDF result</figcaption>
+                <img src="../resources/graphics-posts/graphics-post-stylized-ggx-shading/ggx-vs-stylized-NDF.jpg" alt="Stylized GGX Trowbridge-Reitz NDF result" style="width:100%;height:auto;display:block;margin-top:0.5rem;">
+                <figcaption>Stylized GGX Trowbridge-Reitz NDF, at varying roughness</figcaption>
             </figure>
 
             I made a <a class="simple-link" href="https://www.desmos.com/calculator/drjmgelnyy" target="_blank">desmos graph</a> to visualize what's happening (follow the link to play with its parameters). <br>
@@ -154,7 +154,7 @@ float D(vec3 Normal, vec3 HalfVector, float Roughness, float SpecularSize)
                     <figcaption style="margin-top:0.6rem; font-size:0.95rem; color:#555;">Desmos graph animating the Specular Size</figcaption>
                 </figure>
                 <figure style="margin:0; flex:1 1; max-width:48%; text-align:center;">
-                    <img src="../resources/website-icon.jpg" alt="Specular Thresholding" style="width:100%; height:360px; object-fit:cover; display:block; border:1px solid #ddd; border-radius:4px;">
+                    <img src="../resources/graphics-posts/graphics-post-stylized-ggx-shading/varying-specular-size.jpg" alt="Specular Thresholding" style="width:100%; height:360px; object-fit:cover; display:block; border:1px solid #ddd; border-radius:4px;">
                     <figcaption style="margin-top:0.6rem; font-size:0.95rem; color:#555;">Resulting highlight shape</figcaption>
                 </figure>
             </div>
@@ -162,7 +162,7 @@ float D(vec3 Normal, vec3 HalfVector, float Roughness, float SpecularSize)
         </p>
 
 
-        <h2>Advanced version</h2>
+        <h2>Improved version</h2>
         <p>The simple version has the benefit to be extra cheap (1 mul and 1 max), but it impacts too much rough materials, making them appear overly bright. <br>
             Here is a slightly more complex equation that preserves the original NDF shape at high roughness, while still expanding the highlights at low roughness. <br>
 <pre><code class="language-glsl">// Stylized GGX Trowbridge-Reitz NDF
@@ -172,26 +172,20 @@ float D(vec3 Normal, vec3 HalfVector, float Roughness, float SpecularSize, float
     float a2 = a * a;
     float NdotH = max(dot(Normal, HalfVector), 0.0);
     float NdotH2 = NdotH * NdotH;
-    // The GGXMatching parameter controls how much the stylized NDF matches the GGX one at high roughness. In practice, 2.0 works well.
-    float denom = max((SpecularSize * <strong>pow(1.0 - a, GGXMatching) + 1.0)</strong> * NdotH2 * (a2 - 1.0) + 1.0, 0.00001);
+    // The GGXMatching parameter controls how much the stylized NDF matches the GGX one at high roughness. In practice, 4 or 8 works well.
+    float denom = max((SpecularSize * <strong>pow(1.0 - a, GGXMatching) + 1.0)</strong> * NdotH2 * (a2 - 1.0) + 1.0, 0.0001);
     return a2 / (PI * denom * denom);
 }</code></pre>
 
 
-            <div style="display:flex; gap:2rem; justify-content:center; align-items:flex-start; flex-wrap:wrap; margin:2rem 0;">
-                <figure style="margin:0; flex:1 1 320px; max-width:480px; text-align:center;">
-                    <img src="../resources/website-icon.jpg" alt="Simple stylized result" style="width:100%; height:360px; object-fit:cover; display:block; border:1px solid #ddd; border-radius:4px;">
-                    <figcaption style="margin-top:0.6rem; font-size:0.95rem; color:#555;">Simple stylized version</figcaption>
-                </figure>
-                <figure style="margin:0; flex:1 1 320px; max-width:480px; text-align:center;">
-                    <img src="../resources/website-icon.jpg" alt="Advanced stylized result" style="width:100%; height:360px; object-fit:cover; display:block; border:1px solid #ddd; border-radius:4px;">
-                    <figcaption style="margin-top:0.6rem; font-size:0.95rem; color:#555;">Advanced stylized version</figcaption>
-                </figure>
-            </div>
+            <figure style="margin:0;margin-bottom:3rem;text-align:center;">
+                <img src="../resources/graphics-posts/graphics-post-stylized-ggx-shading/ggx-vs-simple-vs-improved-NDF.jpg" alt="Improved Stylized GGX Trowbridge-Reitz NDF" style="width:100%;height:auto;display:block;margin-top:0.5rem;">
+                <figcaption>Improved Stylized GGX Trowbridge-Reitz NDF. <br>The last three columns match better the original GGX energy distribution.</figcaption>
+            </figure>
 
             Here is the <a class="simple-link" href="https://www.desmos.com/calculator/drjmgelnyy" target="_blank">desmos graph</a> animating the roughness (at high roughness, the curves flatten). <br>
-            <b style="color:black;">Black curve</b> is the Trowbridge-Reitz NDF, <b style="color:red;">red curve</b> is the simple stylized and <b style="color:green;">green curve</b> is the advanced stylized.
-            The advanced version matches the red curve at high roughness, and the black curve at low roughness.<br>
+            <b style="color:black;">Black curve</b> is the Trowbridge-Reitz NDF, <b style="color:red;">red curve</b> is the simple stylized and <b style="color:green;">green curve</b> is the improved stylized.
+            The improved version matches the red curve at high roughness, and the black curve at low roughness.<br>
             <figure>
                 <iframe src="https://www.desmos.com/calculator/gvbvdlsjas?embed" style="width:100%; height:360px; border:1px solid #ddd; border-radius:4px; background:#fff; display:block;" frameborder="0"></iframe>
                 <figcaption style="margin-top:0.6rem; font-size:0.95rem; color:#555;">Desmos graph animating the roughness</figcaption>
