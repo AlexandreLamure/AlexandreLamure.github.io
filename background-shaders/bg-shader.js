@@ -17,7 +17,7 @@ void main() {
 }`;
 
     const DEFAULT_OPTIONS = {
-        renderScale: 0.5,
+        renderScale: 0.25,
         maxFps: 45,
         maxDpr: 1.5
     };
