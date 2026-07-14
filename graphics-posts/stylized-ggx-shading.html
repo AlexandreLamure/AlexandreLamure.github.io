@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#ffffff">
 
     <!-- Open Graph / Facebook -->
-    <meta property="og:url" content="https://alexandrelamure.github.io/graphics-posts/graphics-post-stylized-ggx-shading.html">
+    <meta property="og:url" content="https://alexandrelamure.github.io/graphics-posts/stylized-ggx-shading.html">
     <meta property="og:title" content="Stylized GGX shading | Alexandre Lamure">
     <meta property="og:description" content="Stylized GGX shading — sharp specular highlights.">
     <meta property="og:type" content="website">
@@ -21,7 +21,7 @@
     <meta name="twitter:image" content="https://alexandrelamure.github.io/resources/profile-picture.jpg">
 
     <title>Stylized GGX shading | Alexandre Lamure</title>
-    <link rel="canonical" href="https://alexandrelamure.github.io/graphics-posts/graphics-post-stylized-ggx-shading.html">
+    <link rel="canonical" href="https://alexandrelamure.github.io/graphics-posts/stylized-ggx-shading.html">
     <link rel="stylesheet" href="../style.css">
     <link rel="icon" href="../resources/website-icon.jpg" type="image/jpeg">
     <link rel="apple-touch-icon" href="../resources/website-icon.jpg">
@@ -61,11 +61,11 @@ vec3 Radiance = BRDF * LightIntensity * <strong>step</strong>(<strong>Threshold<
 
         <div style="display:flex;gap:2rem;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin:1rem 0;margin-bottom:4rem;">
             <figure style="margin:0;text-align:center;max-width:48%;">
-                <img src="../resources/graphics-posts/graphics-post-stylized-ggx-shading/diffuse-thresholding.jpg" alt="Diffuse Thresholding" style="width:100%;height:auto;display:block;">
+                <img src="../resources/graphics-posts/stylized-ggx-shading/diffuse-thresholding.jpg" alt="Diffuse Thresholding" style="width:100%;height:auto;display:block;">
                 <figcaption>Diffuse Thresholding</figcaption>
             </figure>
             <figure style="margin:0;text-align:center;max-width:48%;">
-                <img src="../resources/graphics-posts/graphics-post-stylized-ggx-shading/specular-thresholding.jpg" alt="Specular Thresholding" style="width:100%;height:auto;display:block;">
+                <img src="../resources/graphics-posts/stylized-ggx-shading/specular-thresholding.jpg" alt="Specular Thresholding" style="width:100%;height:auto;display:block;">
                 <figcaption>Specular Thresholding</figcaption>
             </figure>
         </div>
@@ -77,15 +77,15 @@ vec3 Radiance = BRDF * LightIntensity * <strong>step</strong>(<strong>Threshold<
 
         <div style="display:flex;gap:0.5rem;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin:1rem 0;margin-bottom:4rem;">
             <figure style="margin:0;text-align:center;max-width:32%;">
-                <video src="../resources/graphics-posts/graphics-post-stylized-ggx-shading/toon.mp4" alt="Toon Shading" autoplay loop muted style="width:100%;height:auto;display:block;"></video>
+                <video src="../resources/graphics-posts/stylized-ggx-shading/toon.mp4" alt="Toon Shading" autoplay loop muted style="width:100%;height:auto;display:block;"></video>
                 <figcaption>Toon</figcaption>
             </figure>
             <figure style="margin:0;text-align:center;max-width:32%;">
-                <video src="../resources/graphics-posts/graphics-post-stylized-ggx-shading/stylized.mp4" alt="Stylized GGX Shading" autoplay loop muted style="width:100%;height:auto;display:block;"></video>
+                <video src="../resources/graphics-posts/stylized-ggx-shading/stylized.mp4" alt="Stylized GGX Shading" autoplay loop muted style="width:100%;height:auto;display:block;"></video>
                 <figcaption>Stylized GGX</figcaption>
             </figure>
             <figure style="margin:0;text-align:center;max-width:32%;">
-                <video src="../resources/graphics-posts/graphics-post-stylized-ggx-shading/ggx.mp4" alt="GGX Shading" autoplay loop muted style="width:100%;height:auto;display:block;"></video>
+                <video src="../resources/graphics-posts/stylized-ggx-shading/ggx.mp4" alt="GGX Shading" autoplay loop muted style="width:100%;height:auto;display:block;"></video>
                 <figcaption>GGX</figcaption>
             </figure>
         </div>
@@ -127,7 +127,7 @@ float D(vec3 Normal, vec3 HalfVector, float Roughness)
 }</code></pre>
 
             <figure style="margin:0;margin-bottom:3rem;text-align:center;">
-                <img src="../resources/graphics-posts/graphics-post-stylized-ggx-shading/ggx-NDF.jpg" alt="GGX Trowbridge-Reitz NDF" style="width:100%;height:auto;display:block;margin-top:0.5rem;border-radius:4px;">
+                <img src="../resources/graphics-posts/stylized-ggx-shading/ggx-NDF.jpg" alt="GGX Trowbridge-Reitz NDF" style="width:100%;height:auto;display:block;margin-top:0.5rem;border-radius:4px;">
                 <figcaption>GGX Trowbridge-Reitz NDF, at varying roughness</figcaption>
             </figure>
 
@@ -143,7 +143,7 @@ float D(vec3 Normal, vec3 HalfVector, float Roughness, float SpecularSize)
     return a2 / (PI * denom * denom);
 }</code></pre>
             <figure style="margin:0;margin-bottom:3rem;text-align:center;">
-                <img src="../resources/graphics-posts/graphics-post-stylized-ggx-shading/ggx-vs-stylized-NDF.jpg" alt="Stylized GGX Trowbridge-Reitz NDF" style="width:100%;height:auto;display:block;margin-top:0.5rem;;border-radius:4px;">
+                <img src="../resources/graphics-posts/stylized-ggx-shading/ggx-vs-stylized-NDF.jpg" alt="Stylized GGX Trowbridge-Reitz NDF" style="width:100%;height:auto;display:block;margin-top:0.5rem;;border-radius:4px;">
                 <figcaption>Stylized GGX Trowbridge-Reitz NDF, at varying roughness</figcaption>
             </figure>
 
@@ -158,7 +158,7 @@ float D(vec3 Normal, vec3 HalfVector, float Roughness, float SpecularSize)
                     <figcaption style="margin-top:0.6rem; font-size:0.95rem; color:#555;">Desmos graph animating the Specular Size</figcaption>
                 </figure>
                 <figure style="margin:0; flex:1 1; max-width:48%; text-align:center;">
-                    <img src="../resources/graphics-posts/graphics-post-stylized-ggx-shading/varying-specular-size.jpg" alt="Varying Specular Size" style="width:100%; height:360px; object-fit:cover; display:block; border:1px solid #ddd; border-radius:4px;">
+                    <img src="../resources/graphics-posts/stylized-ggx-shading/varying-specular-size.jpg" alt="Varying Specular Size" style="width:100%; height:360px; object-fit:cover; display:block; border:1px solid #ddd; border-radius:4px;">
                     <figcaption style="margin-top:0.6rem; font-size:0.95rem; color:#555;">Resulting highlight shape</figcaption>
                 </figure>
             </div>
@@ -182,7 +182,7 @@ float D(vec3 Normal, vec3 HalfVector, float Roughness, float SpecularSize, float
 }</code></pre>
 
             <figure style="margin:0;margin-bottom:3rem;text-align:center;">
-                <img src="../resources/graphics-posts/graphics-post-stylized-ggx-shading/ggx-vs-simple-vs-improved-NDF.jpg" alt="Improved Stylized GGX Trowbridge-Reitz NDF" style="width:100%;height:auto;display:block;margin-top:0.5rem;border-radius:4px;">
+                <img src="../resources/graphics-posts/stylized-ggx-shading/ggx-vs-simple-vs-improved-NDF.jpg" alt="Improved Stylized GGX Trowbridge-Reitz NDF" style="width:100%;height:auto;display:block;margin-top:0.5rem;border-radius:4px;">
                 <figcaption>Improved Stylized GGX Trowbridge-Reitz NDF. <br>The last three columns match better the original GGX energy distribution.</figcaption>
             </figure>
 
@@ -198,7 +198,7 @@ float D(vec3 Normal, vec3 HalfVector, float Roughness, float SpecularSize, float
         <h2>Demo</h2>
         <p>Here is the final look on varying roughness, metalness and specular sizes.
             <figure style="margin:0;margin-bottom:3rem;text-align:center;max-width:98%;">
-                <video src="../resources/graphics-posts/graphics-post-stylized-ggx-shading/demo.mp4" alt="Stylized GGX Shading" autoplay loop muted style="width:100%;height:auto;display:block;"></video>
+                <video src="../resources/graphics-posts/stylized-ggx-shading/demo.mp4" alt="Stylized GGX Shading" autoplay loop muted style="width:100%;height:auto;display:block;"></video>
                 <figcaption>Stylized GGX Shading</figcaption>
             </figure>
         </p>
