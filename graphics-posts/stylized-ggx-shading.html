@@ -77,15 +77,15 @@ vec3 Radiance = BRDF * LightIntensity * <strong>step</strong>(<strong>Threshold<
 
         <div style="display:flex;gap:0.5rem;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin:1rem 0;margin-bottom:4rem;">
             <figure style="margin:0;text-align:center;max-width:32%;">
-                <video src="../resources/graphics-posts/stylized-ggx-shading/toon.mp4" alt="Toon Shading" autoplay loop muted style="width:100%;height:auto;display:block;"></video>
+                <video src="../resources/graphics-posts/stylized-ggx-shading/toon.mp4" autoplay loop muted style="width:100%;height:auto;display:block;">Toon Shading video</video>
                 <figcaption>Toon</figcaption>
             </figure>
             <figure style="margin:0;text-align:center;max-width:32%;">
-                <video src="../resources/graphics-posts/stylized-ggx-shading/stylized.mp4" alt="Stylized GGX Shading" autoplay loop muted style="width:100%;height:auto;display:block;"></video>
+                <video src="../resources/graphics-posts/stylized-ggx-shading/stylized.mp4" autoplay loop muted style="width:100%;height:auto;display:block;">Stylized GGX Shading video</video>
                 <figcaption>Stylized GGX</figcaption>
             </figure>
             <figure style="margin:0;text-align:center;max-width:32%;">
-                <video src="../resources/graphics-posts/stylized-ggx-shading/ggx.mp4" alt="GGX Shading" autoplay loop muted style="width:100%;height:auto;display:block;"></video>
+                <video src="../resources/graphics-posts/stylized-ggx-shading/ggx.mp4" autoplay loop muted style="width:100%;height:auto;display:block;">GGX Shading video</video>
                 <figcaption>GGX</figcaption>
             </figure>
         </div>
@@ -96,8 +96,9 @@ vec3 Radiance = BRDF * LightIntensity * <strong>step</strong>(<strong>Threshold<
         </p>
         <p>
         Another example is <cite>Spellcasters Chronicles</cite>, which I had the chance to work on. During development we tested many things, including this "Stylized GGX Shading" I'm describing here. In the end we landed on something else, but it still uses a mix of 2D and 3D looks. 
+        </p>
 
-        <div style="display:flex;gap:2rem;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin:1rem 0;margin-bottom:2rem;">
+        <div style="display:flex;gap:2rem;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin:1rem 0;margin-bottom:4rem;">
             <figure style="margin:0;text-align:center;max-width:48%;">
                 <img src="https://assets.nintendo.com/image/upload/f_auto/q_auto/dpr_1.5/c_scale,w_900/ncom/en_US/articles/2023/the-final-legend-of-zelda-tears-of-the-kingdom-trailer-is-soaring-your-way/TotK_image3" alt="A screenshot from Zelda: Tears of the Kingdom" style="width:100%;height:auto;display:block;">
                 <figcaption>A screenshot from Zelda: Tears of the Kingdom</figcaption>
@@ -107,15 +108,14 @@ vec3 Radiance = BRDF * LightIntensity * <strong>step</strong>(<strong>Threshold<
                 <figcaption>A screenshot from Spellcasters Chronicles</figcaption>
             </figure>
         </div>
-        <br>
-        </p>
 
         <h2>Simple version</h2>
         <p>The most common PBR model is the <a class="simple-link" href="https://learnopengl.com/PBR/Theory" target="_blank">GGX Cook-Torrance microfacet model</a>. <br>
             The surface's asperity is analytically modeled as a collection of oriented microfacets, and controlled by a roughness parameter.
             The distribution of these microfacets' normals is described by the Normal Distribution Function (NDF).
-            Real-time engines usually use the Trowbridge-Reitz NDF, which looks like this: <br>
-            <pre><code class="language-glsl">// GGX Trowbridge-Reitz NDF
+            Real-time engines usually use the Trowbridge-Reitz NDF, which looks like this:
+        </p>
+        <pre><code class="language-glsl">// GGX Trowbridge-Reitz NDF
 float D(vec3 Normal, vec3 HalfVector, float Roughness)
 {
     float a = Roughness * Roughness;
@@ -126,49 +126,50 @@ float D(vec3 Normal, vec3 HalfVector, float Roughness)
     return a2 / (PI * denom * denom);
 }</code></pre>
 
-            <figure style="margin:0;margin-bottom:3rem;text-align:center;">
-                <img src="../resources/graphics-posts/stylized-ggx-shading/ggx-NDF.jpg" alt="GGX Trowbridge-Reitz NDF" style="width:100%;height:auto;display:block;margin-top:0.5rem;border-radius:4px;">
-                <figcaption>GGX Trowbridge-Reitz NDF, at varying roughness</figcaption>
-            </figure>
+        <figure style="margin:0;margin-bottom:3rem;text-align:center;">
+            <img src="../resources/graphics-posts/stylized-ggx-shading/ggx-NDF.jpg" alt="GGX Trowbridge-Reitz NDF" style="width:100%;height:auto;display:block;margin-top:0.5rem;border-radius:4px;">
+            <figcaption>GGX Trowbridge-Reitz NDF, at varying roughness</figcaption>
+        </figure>
 
-            By slightly modifying this equation, we can expand the specular highlights.
-            <pre><code class="language-glsl">// Stylized GGX Trowbridge-Reitz NDF
+        <p>By slightly modifying this equation, we can expand the specular highlights.</p>
+        <pre><code class="language-glsl">// Stylized GGX Trowbridge-Reitz NDF
 float D(vec3 Normal, vec3 HalfVector, float Roughness, float SpecularSize)
 {
-    float a = Roughness * Roughness;
-    float a2 = a * a;
-    float NdotH = max(dot(Normal, HalfVector), 0.0);
-    float NdotH2 = NdotH * NdotH;
-    float denom = <strong>max(</strong><strong>SpecularSize</strong> * NdotH2 * (a2 - 1.0) + 1.0<strong>, 0.0001)</strong>;
-    return a2 / (PI * denom * denom);
+float a = Roughness * Roughness;
+float a2 = a * a;
+float NdotH = max(dot(Normal, HalfVector), 0.0);
+float NdotH2 = NdotH * NdotH;
+float denom = <strong>max(</strong><strong>SpecularSize</strong> * NdotH2 * (a2 - 1.0) + 1.0<strong>, 0.0001)</strong>;
+return a2 / (PI * denom * denom);
 }</code></pre>
-            <figure style="margin:0;margin-bottom:3rem;text-align:center;">
-                <img src="../resources/graphics-posts/stylized-ggx-shading/ggx-vs-stylized-NDF.jpg" alt="Stylized GGX Trowbridge-Reitz NDF" style="width:100%;height:auto;display:block;margin-top:0.5rem;;border-radius:4px;">
-                <figcaption>Stylized GGX Trowbridge-Reitz NDF, at varying roughness</figcaption>
-            </figure>
+        <figure style="margin:0;margin-bottom:3rem;text-align:center;">
+            <img src="../resources/graphics-posts/stylized-ggx-shading/ggx-vs-stylized-NDF.jpg" alt="Stylized GGX Trowbridge-Reitz NDF" style="width:100%;height:auto;display:block;margin-top:0.5rem;border-radius:4px;">
+            <figcaption>Stylized GGX Trowbridge-Reitz NDF, at varying roughness</figcaption>
+        </figure>
 
-            I made a <a class="simple-link" href="https://www.desmos.com/calculator/drjmgelnyy" target="_blank">Desmos graph</a> to visualize what's happening (follow the link to play with its parameters). <br>
+        <p>I made a <a class="simple-link" href="https://www.desmos.com/calculator/drjmgelnyy" target="_blank">Desmos graph</a> to visualize what's happening (follow the link to play with its parameters). <br>
             Abscissa represents the dot product of the surface normal and the half-vector (<code>NdotH</code>). <br>
             Ordinate represents the NDF value (the <code>return</code> value). Higher means more reflected energy. <br>
             <b style="color:black;">Black curve</b> is the original Trowbridge-Reitz NDF, <b style="color:red;">red curve</b> is the stylized one. <br>
-            Our new "Specular Size" parameter allows us to return more energy at higher angles while preserving the original shape of the NDF. <br> 
-            <div style="display:flex; gap:2rem; justify-content:center; align-items:flex-start; flex-wrap:wrap; margin:1rem 0; margin-bottom:4rem;">
-                <figure style="margin:0; flex:1 1; max-width:48%; text-align:center;">
-                    <iframe src="https://www.desmos.com/calculator/jnt2ph0v2g?embed" style="width:100%; height:360px; border:1px solid #ddd; border-radius:4px; background:#fff; display:block;" frameborder="0"></iframe>
-                    <figcaption style="margin-top:0.6rem; font-size:0.95rem; color:#555;">Desmos graph animating the Specular Size</figcaption>
-                </figure>
-                <figure style="margin:0; flex:1 1; max-width:48%; text-align:center;">
-                    <img src="../resources/graphics-posts/stylized-ggx-shading/varying-specular-size.jpg" alt="Varying Specular Size" style="width:100%; height:360px; object-fit:cover; display:block; border:1px solid #ddd; border-radius:4px;">
-                    <figcaption style="margin-top:0.6rem; font-size:0.95rem; color:#555;">Resulting highlight shape</figcaption>
-                </figure>
-            </div>
-
+            Our new "Specular Size" parameter allows us to return more energy at higher angles while preserving the original shape of the NDF.
         </p>
+        <div style="display:flex; gap:2rem; justify-content:center; align-items:flex-start; flex-wrap:wrap; margin:1rem 0; margin-bottom:4rem;">
+            <figure style="margin:0; flex:1 1; max-width:48%; text-align:center;">
+                <iframe src="https://www.desmos.com/calculator/jnt2ph0v2g?embed" style="width:100%; height:360px; border:1px solid #ddd; border-radius:4px; background:#fff; display:block;" frameborder="0"></iframe>
+                <figcaption style="margin-top:0.6rem; font-size:0.95rem; color:#555;">Desmos graph animating the Specular Size</figcaption>
+            </figure>
+            <figure style="margin:0; flex:1 1; max-width:48%; text-align:center;">
+                <img src="../resources/graphics-posts/stylized-ggx-shading/varying-specular-size.jpg" alt="Varying Specular Size" style="width:100%; height:360px; object-fit:cover; display:block; border:1px solid #ddd; border-radius:4px;">
+                <figcaption style="margin-top:0.6rem; font-size:0.95rem; color:#555;">Resulting highlight shape</figcaption>
+            </figure>
+        </div>
 
 
         <h2>Improved version</h2>
         <p>The simple version has the benefit of being extra cheap (1 mul and 1 max), but it impacts rough materials too much, making them appear overly bright. <br>
-            Here is a slightly more complex equation that preserves the original NDF shape at high roughness, while still expanding the highlights at low roughness. <br>
+            Here is a slightly more complex equation that preserves the original NDF shape at high roughness, while still expanding the highlights at low roughness.
+        </p>
+
 <pre><code class="language-glsl">// Stylized GGX Trowbridge-Reitz NDF
 float D(vec3 Normal, vec3 HalfVector, float Roughness, float SpecularSize, float GGXMatching)
 {
@@ -181,41 +182,42 @@ float D(vec3 Normal, vec3 HalfVector, float Roughness, float SpecularSize, float
     return a2 / (PI * denom * denom);
 }</code></pre>
 
-            <figure style="margin:0;margin-bottom:3rem;text-align:center;">
-                <img src="../resources/graphics-posts/stylized-ggx-shading/ggx-vs-simple-vs-improved-NDF.jpg" alt="Improved Stylized GGX Trowbridge-Reitz NDF" style="width:100%;height:auto;display:block;margin-top:0.5rem;border-radius:4px;">
-                <figcaption>Improved Stylized GGX Trowbridge-Reitz NDF. <br>The last three columns better match the original GGX energy distribution.</figcaption>
-            </figure>
+        <figure style="margin:0;margin-bottom:3rem;text-align:center;">
+            <img src="../resources/graphics-posts/stylized-ggx-shading/ggx-vs-simple-vs-improved-NDF.jpg" alt="Improved Stylized GGX Trowbridge-Reitz NDF" style="width:100%;height:auto;display:block;margin-top:0.5rem;border-radius:4px;">
+            <figcaption>Improved Stylized GGX Trowbridge-Reitz NDF. <br>The last three columns better match the original GGX energy distribution.</figcaption>
+        </figure>
 
-            Here is the graph animating the roughness (at high roughness the curves flatten). <br>
+        <p>Here is the graph animating the roughness (at high roughness the curves flatten). <br>
             <b style="color:black;">Black curve</b> is the Trowbridge-Reitz NDF, <b style="color:red;">red curve</b> is the simple stylized and <b style="color:green;">green curve</b> is the improved stylized.
-            The improved version matches the red curve at high roughness, and the black curve at low roughness.<br>
-            <figure style="margin:0;margin-bottom:3rem;text-align:center;">
-                <iframe src="https://www.desmos.com/calculator/gvbvdlsjas?embed" style="width:100%; height:360px; border:1px solid #ddd; border-radius:4px; background:#fff; display:block;" frameborder="0"></iframe>
-                <figcaption style="margin-top:0.6rem; font-size:0.95rem; color:#555;">Desmos graph animating the roughness</figcaption>
-            </figure>
+            The improved version matches the red curve at high roughness, and the black curve at low roughness.
         </p>
+        <figure style="margin:0;margin-bottom:4rem;text-align:center;">
+            <iframe src="https://www.desmos.com/calculator/gvbvdlsjas?embed" style="width:100%; height:360px; border:1px solid #ddd; border-radius:4px; background:#fff; display:block;" frameborder="0"></iframe>
+            <figcaption style="margin-top:0.6rem; font-size:0.95rem; color:#555;">Desmos graph animating the roughness</figcaption>
+        </figure>
+
 
         <h2>Demo</h2>
-        <p>Here is the final look under varying roughness, metalness and specular size.
-            <figure style="margin:0;margin-bottom:3rem;text-align:center;max-width:98%;">
-                <video src="../resources/graphics-posts/stylized-ggx-shading/demo.mp4" alt="Stylized GGX Shading" autoplay loop muted style="width:100%;height:auto;display:block;"></video>
-                <figcaption>Stylized GGX Shading</figcaption>
-            </figure>
-        </p>
+        <p>Here is the final look under varying roughness, metalness and specular size.</p>
+        <figure style="margin:0;margin-bottom:4rem;text-align:center;max-width:98%;">
+            <video src="../resources/graphics-posts/stylized-ggx-shading/demo.mp4" autoplay loop muted style="width:100%;height:auto;display:block;">Stylized GGX Shading video</video>
+            <figcaption>Stylized GGX Shading</figcaption>
+        </figure>
+
 
         <h2>Side notes</h2>
         <p>One might feel like this stylized GGX look is not "toon" enough. <br>
             On Spellcasters we tested many additions to this trick:
             <ul>
-                <li>Prune the GI probes by only computing 3 SH coefficients (global, up and down for the sky and ground) instead of our usual 9 coefficients. This lets us reduce the directionality, making it feel more like hand-drawn 2D art. It also saves performance as we can store fewer coefficients. The same kind of idea has been used in <a class="simple-link" target="_blank" noreferrer noopener href="https://youtu.be/gdBACyIOCtc?t=2331">Hi-Fi Rush</a>.</li>
-                <li>Simplify the distant props using a mix of a depth-based <a class="simple-link" target="_blank" noreferrer noopener href="https://www.kyprianidis.com/p/gpupro/">Kuwahara filter</a>, mip biasing, and simple fog.</li>
+                <li>Prune the GI probes by only computing 3 SH coefficients (global, up and down for the sky and ground) instead of our usual 9 coefficients. This lets us reduce the directionality, making it feel more like hand-drawn 2D art. It also saves performance as we can store fewer coefficients. The same kind of idea has been used in <a class="simple-link" target="_blank" rel="noreferrer noopener" href="https://youtu.be/gdBACyIOCtc?t=2331">Hi-Fi Rush</a>.</li>
+                <li>Simplify the distant props using a mix of a depth-based <a class="simple-link" target="_blank" rel="noreferrer noopener" href="https://www.kyprianidis.com/p/gpupro/">Kuwahara filter</a>, mip biasing, and simple fog.</li>
                 <li>Rim lighting.</li>
                 <li>Outlines and inlines.</li>
                 <li>And of course, a lot of work went into the textures and modeling.</li>
             </ul>
         </p>
 
-        <p><a class="btn-small" style="margin-top:2rem;" href="../graphics.html"><i class="fas fa-arrow-left"></i>Back to graphics</a></p>
+        <p><a class="btn-small" style="margin-top:3rem;" href="../graphics.html"><i class="fas fa-arrow-left"></i>Back to graphics</a></p>
     </main>
 </body>
 
