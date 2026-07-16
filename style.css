@@ -260,15 +260,15 @@ nav {
 
 .media-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 0.5rem;
     align-items: start;
 }
 
-/* stack to one column under 600px */
+/* keep embed groups readable on narrow screens in a compact two-up grid */
 @media (max-width: 600px) {
     .media-container {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     }
 }
 
