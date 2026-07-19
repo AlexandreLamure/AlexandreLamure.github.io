@@ -277,6 +277,115 @@ nav {
     }
 }
 
+/* Music Journal / Showcase tabs */
+.music-tabs {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1.25rem;
+    margin-bottom: 0.25rem;
+}
+
+.music-tab {
+    appearance: none;
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.music-tab:hover {
+    color: var(--accent);
+}
+
+.music-tab[aria-selected="true"] {
+    color: var(--accent);
+    font-weight: 700;
+}
+
+.music-tab[aria-selected="true"]::after {
+    content: '';
+    display: block;
+    height: 3px;
+    background: var(--accent);
+    border-radius: 2px;
+    margin-top: 6px;
+}
+
+/* Music Showcase carousel */
+.music-showcase {
+    --showcase-card-gap: 0.75rem;
+    --showcase-cols: 4;
+    width: 60vw;
+    max-width: 100%;
+    margin: 1.5rem auto 3rem;
+    padding: 0;
+    container-type: inline-size;
+}
+
+.music-showcase-row {
+    --showcase-cols: 4;
+    overflow: hidden;
+    margin-bottom: var(--showcase-card-gap);
+}
+
+.music-showcase-row--odd .music-showcase-track {
+    justify-content: center;
+}
+
+.music-showcase-row:last-child {
+    margin-bottom: 0;
+}
+
+.music-showcase-track {
+    display: flex;
+    gap: var(--showcase-card-gap);
+    will-change: transform;
+}
+
+.music-showcase-track.is-animating {
+    transition: transform 0.55s ease;
+}
+
+.music-showcase-card {
+    --showcase-card-width: calc(
+        (100cqw - (var(--showcase-cols) - 1) * var(--showcase-card-gap))
+        / var(--showcase-cols)
+    );
+    flex: 0 0 var(--showcase-card-width);
+    width: var(--showcase-card-width);
+}
+
+.music-showcase-card .video-wrapper {
+    margin: 0;
+    box-shadow: none;
+}
+
+.music-showcase-card .video-wrapper iframe {
+    inset: 0;
+}
+
+.music-showcase-card .embed-youtube,
+.music-showcase-card .embed-soundcloud {
+    margin: 0;
+}
+
+@media (max-width: 700px) {
+    .music-showcase {
+        width: 100%;
+        padding: 0 0.5rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .music-showcase-track.is-animating {
+        transition: none;
+    }
+}
+
 /* 7. Teaching Grid & Projects */
 .teaching-grid {
     display: grid;

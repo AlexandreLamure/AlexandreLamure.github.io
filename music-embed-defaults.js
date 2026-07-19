@@ -18,24 +18,37 @@
         iframe.removeAttribute('data-src');
     }
 
-    const iframes = document.querySelectorAll('.embed-youtube[data-src], .embed-soundcloud[data-src]');
-    if (!iframes.length) return;
+    let observer = null;
 
-    if (!('IntersectionObserver' in window)) {
-        iframes.forEach(loadIframe);
-        return;
+    function observeEmbeds(root) {
+        const scope = root || document;
+        const iframes = scope.querySelectorAll
+            ? scope.querySelectorAll('.embed-youtube[data-src], .embed-soundcloud[data-src]')
+            : [];
+
+        if (!iframes.length) return;
+
+        if (!('IntersectionObserver' in window)) {
+            iframes.forEach(loadIframe);
+            return;
+        }
+
+        if (!observer) {
+            observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (!entry.isIntersecting) return;
+                        loadIframe(entry.target);
+                        observer.unobserve(entry.target);
+                    });
+                },
+                { rootMargin: '200px' }
+            );
+        }
+
+        iframes.forEach((iframe) => observer.observe(iframe));
     }
 
-    const observer = new IntersectionObserver(
-        (entries) => {
-            entries.forEach((entry) => {
-                if (!entry.isIntersecting) return;
-                loadIframe(entry.target);
-                observer.unobserve(entry.target);
-            });
-        },
-        { rootMargin: '200px' }
-    );
-
-    iframes.forEach((iframe) => observer.observe(iframe));
+    window.observeMusicEmbeds = observeEmbeds;
+    observeEmbeds(document);
 })();
