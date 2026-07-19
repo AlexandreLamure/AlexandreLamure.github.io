@@ -548,7 +548,7 @@ body > :not(#bg-shader-layer) {
 .graphics-post-title {
     font-weight: 700;
     font-size: 1.05rem;
-    margin-bottom: 4px;
+    margin: 0 0 4px;
 }
 
 .graphics-post-date {
