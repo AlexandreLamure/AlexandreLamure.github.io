@@ -8,7 +8,7 @@
     --line: #dddddd;
     --yt-red: #FF0000;
     --sc-orange: #ff5500;
-    --showcase-row-height: 340px;
+    --teaching-showcase-row-height: 340px;
 }
 
 body {
@@ -71,8 +71,8 @@ nav {
     padding: 0 1rem;
 }
 
-/* Page-specific width override */
-.wide-page {
+/* Teaching page width override */
+.teaching-wide {
     max-width: 1400px;
 }
 
@@ -174,7 +174,7 @@ nav {
 }
 
 /* 5. Music & Platform Links */
-.platform-link {
+.music-platform-link {
     font-weight: 600;
     text-decoration: none;
     padding-bottom: 2px;
@@ -182,19 +182,19 @@ nav {
     transition: all 0.2s ease;
 }
 
-.platform-link.yt {
+.music-platform-link.yt {
     color: var(--yt-red);
 }
 
-.platform-link.yt:hover {
+.music-platform-link.yt:hover {
     border-bottom-color: var(--yt-red);
 }
 
-.platform-link.sc {
+.music-platform-link.sc {
     color: var(--sc-orange);
 }
 
-.platform-link.sc:hover {
+.music-platform-link.sc:hover {
     border-bottom-color: var(--sc-orange);
 }
 
@@ -221,6 +221,11 @@ nav {
 }
 
 .music-post-separator {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.teaching-post-separator {
     margin-top: 1rem;
     margin-bottom: 1rem;
 }
@@ -283,7 +288,7 @@ nav {
     grid-template-columns: 1fr 1fr;
 }
 
-.course-column {
+.teaching-course-column {
     display: flex;
     flex-direction: column;
 }
@@ -293,7 +298,7 @@ nav {
     padding-right: 40px;
 }
 
-.resource-list {
+.teaching-resource-list {
     list-style: none;
     padding: 0;
     display: flex;
@@ -362,7 +367,7 @@ nav {
         padding-bottom: 40px;
     }
 
-    .wide-page {
+    .teaching-wide {
         max-width: 800px;
     }
 
@@ -409,12 +414,12 @@ body > :not(#bg-shader-layer) {
     }
 }
 
-/* === Students Showcase (simple rows with variable widths) === */
-.students-showcase {
+/* === Teaching students showcase (simple rows with variable widths) === */
+.teaching-students-showcase {
     margin-top: 2rem;
 }
 
-.showcase-grid {
+.teaching-showcase-grid {
     display: flex;
     flex-wrap: wrap;
     /* enforce identical horizontal and vertical spacing */
@@ -425,19 +430,19 @@ body > :not(#bg-shader-layer) {
     padding: 0;
 }
 
-.showcase-item {
+.teaching-showcase-item {
     position: relative;
     overflow: hidden;
     border-radius: 8px;
     background: #f7f7f7;
     box-shadow: 0 6px 18px rgba(10, 10, 10, 0.06);
-    height: var(--showcase-row-height);
+    height: var(--teaching-showcase-row-height);
     flex: 0 0 auto;
     /* width depends on image intrinsic aspect ratio */
     margin: 0;
 }
 
-.showcase-item img {
+.teaching-showcase-item img {
     height: 100%;
     width: auto;
     display: block;
@@ -446,7 +451,7 @@ body > :not(#bg-shader-layer) {
 }
 
 /* centered overlay text */
-.showcase-item .overlay {
+.teaching-showcase-item .teaching-showcase-overlay {
     position: absolute;
     inset: 0;
     display: flex;
@@ -461,25 +466,25 @@ body > :not(#bg-shader-layer) {
     text-align: center;
 }
 
-.overlay-text {
+.teaching-showcase-overlay-text {
     font-weight: 700;
     font-size: 1rem;
     line-height: 1.2;
 }
 
-.overlay-text .proj-author {
+.teaching-showcase-overlay-text .teaching-proj-author {
     display: block;
     font-weight: 500;
     font-size: 0.9rem;
     opacity: 0.95;
 }
 
-.showcase-item:hover img {
+.teaching-showcase-item:hover img {
     filter: brightness(0.55) saturate(0.95);
     transform: scale(1.02);
 }
 
-.showcase-item:hover .overlay {
+.teaching-showcase-item:hover .teaching-showcase-overlay {
     opacity: 1;
     background: rgba(0, 0, 0, 0.32);
     pointer-events: auto;
@@ -487,16 +492,16 @@ body > :not(#bg-shader-layer) {
 
 @media (max-width: 900px) {
     :root {
-        --showcase-row-height: 180px;
+        --teaching-showcase-row-height: 180px;
     }
 }
 
 @media (max-width: 600px) {
     :root {
-        --showcase-row-height: 140px;
+        --teaching-showcase-row-height: 140px;
     }
 
-    .showcase-grid {
+    .teaching-showcase-grid {
         gap: 12px;
     }
 }
