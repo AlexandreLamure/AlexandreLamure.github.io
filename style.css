@@ -300,10 +300,15 @@ nav {
     box-shadow: none;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 1200px) {
     .music-showcase {
         width: 100%;
         margin-left: 0;
+    }
+
+    .music-showcase-row > .video-wrapper {
+        flex: 0 0 calc((100% - 2 * var(--showcase-gap)) / 3);
+        width: calc((100% - 2 * var(--showcase-gap)) / 3);
     }
 }
 
