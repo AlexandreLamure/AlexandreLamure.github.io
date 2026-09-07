@@ -26,6 +26,10 @@
     <link rel="apple-touch-icon" href="../resources/website-icon.jpg">
     <link rel="manifest" href="../site.webmanifest">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Syntax highlighting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs/plugins/autoloader/prism-autoloader.min.js"></script>
 </head>
 
 <body>
@@ -60,74 +64,107 @@
         </p>
 
 
-        <h2 style="margin-top:3rem;">What doesn't change</h2>
+        <h2 style="margin-top:3.2rem;">What doesn't change</h2>
         <p>The core ideas of OpenGL are still valid in Vulkan.
         <ul>
-            <li>We still prepare resources like <b>buffers</b> and <b>textures</b> on the CPU, and <b>upload</b> them to the GPU.</li>
+            <li>We prepare resources like <b>buffers</b> and <b>textures</b> on the CPU, and <b>upload</b> them to the GPU.</li>
             <li>We can draw things through a <b>rasterization</b> pipeline.</li>
             <li>This pipeline is configured by <b>pipeline states</b> (blending mode, depth test, backface culling, etc.).</li>
-            <li>We use <b>shaders</b> (vertex, frament, compute...) to program what happens on the GPU.</li>
+            <li>We use <b>shaders</b> (vertex, fragment, compute...) to program what happens on the GPU.</li>
         </ul>
         </p>
 
 
-        <h2 style="margin-top:3rem;">What does change</h2>
+        <h2 style="margin-top:3.2rem;">What does change</h2>
         <p>OpenGL is a black box, many concepts are hidden and simplified. For the sake of performance and flexibility, Vulkan makes them explicit.</p>
 
-        <h3 style="font-size: 1rem; margin-top:1.5rem; height:1rem;">Device choice</h3>
+        <h3 style="font-size: 1.1rem; margin-top:2.0rem; height:1rem;">Device choice</h3>
         <p>
-            <span style="color: #5586a4;">OpenGL</span>: You don't choose which GPU to use, the driver decides for you. It is possible to influence this choice, but the API doesn't make GPU selection a central part of the programming model.<br>
-            <span style="color: #ac162c;">Vulkan</span>: We enumerate the available <b>physical devices</b> (GPUs), inspect their capabilities, and then select one to create a <b>logical device</b> from it.
+            <b style="color: #5586a4;">OpenGL</b>: You don't choose which GPU to use, the driver decides for you. It is certainly possible to influence this choice, but the API doesn't make GPU selection a central part of the programming model.
+        </p>
+        <p>
+            <b style="color: #ac162c;">Vulkan</b>: We enumerate the available <b>physical devices</b> (GPUs), inspect their capabilities, and then select one to create a <b>logical device</b> from it.
             This is important for applications that require high performance or predictability.<br>
         </p>
+        <details>
+            <summary>Click to expand code snippet</summary>
+            <pre><code class="language-cpp">uint32_t deviceCount = 0;
+vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+std::vector&lt;VkPhysicalDevice&gt; physicalDevices(deviceCount);
+vkEnumeratePhysicalDevices(instance, &deviceCount, physicalDevices.data());
 
-        <h3 style="font-size: 1rem; margin-top:1.5rem; height:1rem;">Scheduling</h3>
+VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+for (auto candidate : physicalDevices) {
+    VkPhysicalDeviceProperties properties;
+    vkGetPhysicalDeviceProperties(candidate, &properties);
+    if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
+        physicalDevice = candidate;
+        break;
+    }
+}
+
+VkDevice logicalDevice;
+VkDeviceCreateInfo info{ .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
+vkCreateDevice(physicalDevice, &amp;info, nullptr, &amp;logicalDevice);</code></pre>
+        </details>
+
+        <h3 style="font-size: 1.1rem; margin-top:2.0rem; height:1rem;">Scheduling</h3>
         <p>
-            <span style="color: #5586a4;">OpenGL</span>: GPU scheduling is largely managed by the driver. Beginners tend to think that commands like <code>glBindBuffer</code> or <code>glDrawElements</code> are executed immediately,
-            because the API is designed to let you think that. In reality, they are queued and executed later. They might even get reordered, as OpenGL automatically computes a dependency graph and optimizes the workflow.<br>
-            <span style="color: #ac162c;">Vulkan</span>: this mechanism visible instead of hiding it. We record a list of commands into a <b>command buffer</b>, then submit that command buffer to a queue. Nothing runs until we submit it.<br>
-            We're also responsible for expressing dependencies ourselves: <b>semaphores</b> to order work between frames, <b>fences</b> to know when the CPU can safely reuse or read back a resource,
-            and <b>barriers</b> to insert explicit transitions (e.g. "this image must finish being written before it's read as a shader input").<br>
-            It's more bookkeeping, but the payoff is that the driver has much less guesswork to do at runtime, and we control how work is organized and submitted.
+            <b style="color: #5586a4;">OpenGL</b>: GPU scheduling is largely managed by the driver. Beginners tend to think that commands like <code>glBindBuffer</code> or <code>glDrawElements</code> are executed immediately,
+            because the API is designed to let you think that. In reality, they are queued and executed later. They might even get reordered, as OpenGL automatically computes a dependency graph and optimizes the workflow.
+        </p>
+        <p>
+            <b style="color: #ac162c;">Vulkan</b>: this mechanism isn't hidden anymore. We record a list of commands into a <b>command buffer</b>, then submit that command buffer to a queue. Nothing runs until we submit it.<br>
+            We're also responsible for expressing dependencies ourselves using <b>barriers</b>, <b>semaphores</b> and <b>fences</b>. It's more bookkeeping, but the payoff is that the driver has much less guesswork to do at runtime, and we control how work is organized and submitted.
         </p>
 
-        <h3 style="font-size: 1rem; margin-top:1.5rem; height:1rem;">Resource lifetime</h3>
-        <p>OpenGL resources are managed through handles, and the driver takes care of keeping the underlying objects alive for as long as necessary.
-            We can delete a buffer after issuing a draw call using it and OpenGL will make sure that the deletion doesn't happen while the GPU is still using the buffer.<br>
-            Vulkan doesn't do this for you. If you destroy a buffer while the GPU still references it, you'll be in trouble.
-            The CPU and GPU work <b>asynchronously</b>, so our Vulkan application needs some form of lifetime management.
-            We handle this with fences (or timeline semaphores): submit work, associate it with a fence, and only destroy or reuse a resource once that fence signals
-            that the corresponding GPU work has completed. In practice, most engines don't check this per-resource; they defer destruction into a small ring of "frames in flight"
-            and only actually free things a few frames later, once they know the GPU has moved past them.
+        <h3 style="font-size: 1.1rem; margin-top:2.0rem; height:1rem;">Resource lifetime</h3>
+        <p>
+            <b style="color: #5586a4;">OpenGL</b>: We can delete a buffer after issuing a draw call using it and OpenGL will make sure that the deletion doesn't happen while the GPU is still using the buffer.
+            The driver takes care of keeping the underlying objects alive for as long as necessary.
+        </p>
+        <p>
+            <b style="color: #ac162c;">Vulkan</b>: The resource lifetime is our responsibility. Destroying a buffer while the GPU still references it means trouble.
+            The CPU and GPU work <b>asynchronously</b>, so we use <b>fences</b> to signal when the GPU has finished using a resource.
+            In practice, most engines don't check this per-resource; they keep a few <b>frames in flight</b> and defer destruction until that frame's fence signals.
         </p>
         
-        <h3 style="font-size: 1rem; margin-top:1.5rem; height:1rem;">Image layout</h3>
-        <p>TRANSFER_DST_OPTIMAL, SHADER_READ_ONLY_OPTIMAL, etc.
-            Textures in Vulkan aren't just "a texture" the way they are in OpenGL — an image has an explicit layout that describes how its memory is arranged for a given use.
-            TRANSFER_DST_OPTIMAL is the layout we want before copying data into it, SHADER_READ_ONLY_OPTIMAL is what we want before sampling it in a shader, COLOR_ATTACHMENT_OPTIMAL is what we want while rendering into it, and so on.
-            OpenGL quietly rearranges memory for us depending on how a texture is used. Vulkan asks us to say so out loud, via layout transitions inserted as barriers.
-            This is unfamiliar at first, but it maps directly onto something GPUs already do internally (tiling/compression schemes optimized per access pattern) — Vulkan is just making that optimization visible and controllable instead of leaving it to driver heuristics.
+        <h3 style="font-size: 1.1rem; margin-top:2.0rem; height:1rem;">Descriptor sets</h3>
+        <p>
+            <b style="color: #5586a4;">OpenGL</b>: Binding resources is a sequence of individual calls. <code>glBindTexture</code>, <code>glBindBufferBase</code>, <code>glUniform*</code>... each one pokes a global slot, and the driver matches that slot to whatever the currently bound shader expects.
+        </p>
+        <p>
+            <b style="color: #ac162c;">Vulkan</b>: Resources are grouped into <b>descriptor sets</b>. A descriptor set is a table of buffers, images and samplers that we bind as a whole. Its layout is declared up front and must match the shader.
+            The usual trick is to split sets by update frequency: one set for data that changes once per frame (camera, lights), another for data that changes per draw or per pass (material textures).
+            Tiny per-draw values like a model matrix usually go into <b>push constants</b>, a small fast path that doesn't need a descriptor set at all.
         </p>
         
-        <h3 style="font-size: 1rem; margin-top:1.5rem; height:1rem;">Descriptor sets</h3>
-        <p>In OpenGL, binding a resource means calling something like glBindTexture or glBindBufferBase, attaching it to a global binding point that shaders read from implicitly.
-            Vulkan replaces this with descriptor sets: we declare up front, via a descriptor set layout, what kinds of resources (uniform buffers, sampled images, storage buffers...)
-            a shader expects and at which binding slots, then we allocate a descriptor set and write actual resource handles into it before binding the whole set at draw time.
-            It's more ceremony than a single bind call, but it lets the driver validate and compile the pipeline's resource access patterns ahead of time instead of discovering them at draw time,
-            and it lets us swap entire groups of bindings (e.g. per-material or per-frame data) with a single bind instead of many small calls.
+        <h3 style="font-size: 1.1rem; margin-top:2.0rem; height:1rem;">Image layout</h3>
+        <p>
+            <b style="color: #5586a4;">OpenGL</b>: A texture is a texture. We don't tell the driver how we intend to use it at a given moment; it rearranges GPU memory behind the scenes.
+        </p>
+        <p>
+            <b style="color: #ac162c;">Vulkan</b>: Images have an explicit <b>layout</b> that must match their current use.
+            <code>TRANSFER_DST_OPTIMAL</code> for uploads, <code>COLOR_ATTACHMENT_OPTIMAL</code> when rendering into them, <code>SHADER_READ_ONLY_OPTIMAL</code> when sampling, <code>PRESENT_SRC_KHR</code> when presenting to the swapchain.
+            We transition from one layout to another with a <b>barrier</b>. Using an image in the wrong layout is a classic source of validation errors (or silent corruption).
         </p>
         
-        <h3 style="font-size: 1rem; margin-top:1.5rem; height:1rem;">And some other things</h3>
-        <p>SPIR-V, 
+        <h3 style="font-size: 1.1rem; margin-top:2.0rem; height:1rem;">Shader compilation</h3>
+        <p>
+            <b style="color: #5586a4;">OpenGL</b>: We ship GLSL source and compile it at runtime with <code>glCompileShader</code> / <code>glLinkProgram</code>. The driver turns it into GPU machine code, and reloading a shader can be as simple as reading a text file again.
+        </p>
+        <p>
+            <b style="color: #ac162c;">Vulkan</b>: The API only accepts <b>SPIR-V</b>, an intermediate bytecode. GLSL, HLSL or Slang have to be compiled to SPIR-V first, typically at build time, with a compiler like glslang, DXC or <a class="simple-link" href="https://shader-slang.org/" target="_blank">Slang</a>.
+            The driver then consumes SPIR-V. Startup is more predictable, and we get a single IR across vendors, but the "just compile this string" workflow is gone unless we wrap the compiler ourselves.
         </p>
 
-        <h2 style="margin-top:3rem;">Basic Vulkan setup</h2>
+        <h2 style="margin-top:3.2rem;">Basic Vulkan setup</h2>
         <p>To get started, you'll need to install the Vulkan SDK. It will provide you some tools like validation layers (API error checking), a SPIR-V compiler, etc.
             Then I would advise using the following libraries:
             <ul>
                 <li><a class="simple-link" href="https://github.com/zeux/volk" target="_blank">volk</a> for function loading. It replaces glad or glew for OpenGL.</li>
                 <li><a class="simple-link" href="https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator" target="_blank">vma</a> to simplify low-level memory management. That part was completely hidden in OpenGL.</li>
-                <li><a class="simple-link" href="github.com/charles-lunarg/vk-bootstrap" target="_blank">vk-bootstrap</a> can be a good addition if you want to reduce Vulkan's initialization boilerplate.</li>
+                <li><a class="simple-link" href="https://github.com/charles-lunarg/vk-bootstrap" target="_blank">vk-bootstrap</a> can be a good addition if you want to reduce Vulkan's initialization boilerplate.</li>
                 <li><a class="simple-link" href="https://github.com/glfw/glfw" target="_blank">glfw</a>,
                     <a class="simple-link" href="https://github.com/g-truc/glm" target="_blank">glm</a>, 
                     <a class="simple-link" href="https://github.com/nothings/stb" target="_blank">stb</a>, 
@@ -136,11 +173,21 @@
             </ul>
         </p>
 
-        <h2 style="margin-top:3rem;">Architecture</h2>
-        <p>Blablabla
-        </p>
+        <h2 style="margin-top:3.2rem;">Architecture</h2>
+        <p>The rest of the engine shouldn't have to think in Vulkan objects. In nebula I kept an OpenGL-shaped API on top of an explicit Vulkan backend.</p>
+        <p>A singleton context owns the instance, the device, the swapchain, and two <b>frames in flight</b>. Each frame has its own command buffer, fence, and a deletion queue: when a buffer or image is destroyed, it is only actually released after that frame's fence signals. That is how resource lifetime is handled in practice.</p>
+        <p>Rendering goes through a small set of functions: <code>beginFrame</code> / <code>endFrame</code>, <code>drawMesh</code>, <code>drawFullscreen</code>, <code>dispatch</code>. A <code>Program</code> is still "the shaders you bind", except that behind it we cache <b>pipeline variants</b> (blend mode, vertex layout, attachment formats). Raster state that used to be <code>glEnable</code> calls is either baked into the pipeline or set as dynamic state.</p>
+        <p>Resources are bound in two descriptor sets, plus push constants for the rest:</p>
+        <ul>
+            <li><b>Set 0</b>, once per frame: camera UBO, lights, environment cubemap, BRDF LUT.</li>
+            <li><b>Set 1</b>, per draw or dispatch: a handful of sampled textures and an optional storage image.</li>
+            <li><b>Push constants</b>, per object: model matrix, material factors, exposure.</li>
+        </ul>
+        <p>That split is the usual answer to "I used to call <code>glUniform</code> for everything".</p>
+        <p>Render passes use Vulkan 1.3 <b>dynamic rendering</b>, so there is no <code>VkRenderPass</code> / <code>VkFramebuffer</code> object to manage. A thin RAII helper begins rendering, runs the draws, and transitions the attachments to <code>SHADER_READ_ONLY_OPTIMAL</code> so the next pass can sample them. Textures track their current layout, because as we saw, Vulkan will not do it for you.</p>
+        <p>Memory allocation is delegated to VMA, function loading to volk, shaders compiled from Slang to SPIR-V at build time. The OpenGL-era libraries (glfw, glm, stb, tinygltf, imgui) stay. The result is that scene code and materials still look close to the old engine, while the backend is explicit about queues, layouts, and lifetimes.</p>
 
-        <h2 style="margin-top:3rem;">Further reading</h2>
+        <h2 style="margin-top:3.2rem;">Further reading</h2>
         <p>If you want to dig further, I recommend the following resources:
         <ul>
             <li><a class="simple-link" href="https://vulkan-tutorial.com/Introduction" target="_blank">vulkan-tutorial.com</a>, a complete walkthrough, though somewhat outdated</li>
