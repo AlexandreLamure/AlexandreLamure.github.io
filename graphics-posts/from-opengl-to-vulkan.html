@@ -64,7 +64,7 @@
         </p>
 
 
-        <h2 style="margin-top:3.2rem;">What doesn't change</h2>
+        <h2 style="margin-top:4.0rem;">What doesn't change</h2>
         <p>The core ideas of OpenGL are still valid in Vulkan.
         <ul>
             <li>We prepare resources like <b>buffers</b> and <b>textures</b> on the CPU, and <b>upload</b> them to the GPU.</li>
@@ -75,10 +75,10 @@
         </p>
 
 
-        <h2 style="margin-top:3.2rem;">What does change</h2>
+        <h2 style="margin-top:4.0rem;">What does change</h2>
         <p>OpenGL is a black box, many concepts are hidden and simplified. For the sake of performance and flexibility, Vulkan makes them explicit.</p>
 
-        <h3 style="font-size: 1.1rem; margin-top:2.0rem; height:1rem;">Device choice</h3>
+        <h3 style="font-size: 1.1rem; margin-top:2.5rem; height:1rem;">Device choice</h3>
         <p>
             <b style="color: #5586a4;">OpenGL</b>: You don't choose which GPU to use, the driver decides for you. It is certainly possible to influence this choice, but the API doesn't make GPU selection a central part of the programming model.
         </p>
@@ -88,27 +88,31 @@
         </p>
         <details>
             <summary>Click to expand code snippet</summary>
-            <pre><code class="language-cpp">uint32_t deviceCount = 0;
-vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+            <pre><code class="language-cpp">// Enumerate physical devices
+uint32_t deviceCount = 0;
+vkEnumeratePhysicalDevices(instance, &amp;deviceCount, nullptr);
 std::vector&lt;VkPhysicalDevice&gt; physicalDevices(deviceCount);
-vkEnumeratePhysicalDevices(instance, &deviceCount, physicalDevices.data());
+vkEnumeratePhysicalDevices(instance, &amp;deviceCount, physicalDevices.data());
 
+// Select the best GPU
 VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 for (auto candidate : physicalDevices) {
     VkPhysicalDeviceProperties properties;
-    vkGetPhysicalDeviceProperties(candidate, &properties);
+    vkGetPhysicalDeviceProperties(candidate, &amp;properties);
     if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
         physicalDevice = candidate;
         break;
     }
 }
 
+// Create a logical device from the selected physical device
 VkDevice logicalDevice;
 VkDeviceCreateInfo info{ .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
-vkCreateDevice(physicalDevice, &amp;info, nullptr, &amp;logicalDevice);</code></pre>
+vkCreateDevice(physicalDevice, &amp;info, nullptr, &amp;logicalDevice);
+</code></pre>
         </details>
 
-        <h3 style="font-size: 1.1rem; margin-top:2.0rem; height:1rem;">Scheduling</h3>
+        <h3 style="font-size: 1.1rem; margin-top:2.5rem; height:1rem;">Scheduling</h3>
         <p>
             <b style="color: #5586a4;">OpenGL</b>: GPU scheduling is largely managed by the driver. Beginners tend to think that commands like <code>glBindBuffer</code> or <code>glDrawElements</code> are executed immediately,
             because the API is designed to let you think that. In reality, they are queued and executed later. They might even get reordered, as OpenGL automatically computes a dependency graph and optimizes the workflow.
@@ -117,29 +121,120 @@ vkCreateDevice(physicalDevice, &amp;info, nullptr, &amp;logicalDevice);</code></
             <b style="color: #ac162c;">Vulkan</b>: this mechanism isn't hidden anymore. We record a list of commands into a <b>command buffer</b>, then submit that command buffer to a queue. Nothing runs until we submit it.<br>
             We're also responsible for expressing dependencies ourselves using <b>barriers</b>, <b>semaphores</b> and <b>fences</b>. It's more bookkeeping, but the payoff is that the driver has much less guesswork to do at runtime, and we control how work is organized and submitted.
         </p>
+        <details>
+            <summary>Click to expand code snippet</summary>
+            <pre><code class="language-cpp">// Record commands into a command buffer
+vkBeginCommandBuffer(commandBuffer, &amp;beginInfo);
+vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+vkCmdDrawIndexed(commandBuffer, indexCount, 1, 0, 0, 0);
+vkEndCommandBuffer(commandBuffer);
 
-        <h3 style="font-size: 1.1rem; margin-top:2.0rem; height:1rem;">Resource lifetime</h3>
+// Submit the command buffer to a queue
+vkQueueSubmit(queue, 1, &amp;submitInfo, fence);
+</code></pre>
+        </details>
+
+        <h3 style="font-size: 1.1rem; margin-top:2.5rem; height:1rem;">Resource lifetime</h3>
         <p>
             <b style="color: #5586a4;">OpenGL</b>: We can delete a buffer after issuing a draw call using it and OpenGL will make sure that the deletion doesn't happen while the GPU is still using the buffer.
             The driver takes care of keeping the underlying objects alive for as long as necessary.
         </p>
         <p>
             <b style="color: #ac162c;">Vulkan</b>: The resource lifetime is our responsibility. Destroying a buffer while the GPU still references it means trouble.
-            The CPU and GPU work <b>asynchronously</b>, so we use <b>fences</b> to signal when the GPU has finished using a resource.
-            In practice, most engines don't check this per-resource; they keep a few <b>frames in flight</b> and defer destruction until that frame's fence signals.
+            The CPU and GPU work <b>asynchronously</b>, so we use <b>fences</b> to signal when the GPU has finished using a resource.<br>
+            In practice, most engines don't check this per-resource. They keep a few <b>frames in flight</b>: while the GPU is still rendering frame N,
+            the CPU is already recording frame N+1 (often 2 or 3 frames overlap this way). Each in-flight frame has its own command buffers and a fence.
+            We only destroy or reuse a resource once that frame's fence signals, so we know the GPU is done with it.
         </p>
+        <p>TODO: add a schema with frames in flight and fences (submitted, signaled, in use)</p>
+        <details>
+            <summary>Click to expand code snippet</summary>
+            <pre><code class="language-cpp">constexpr uint32_t FRAMES_IN_FLIGHT = 2;
+VkCommandBuffer commandBuffers[FRAMES_IN_FLIGHT];
+VkFence fences[FRAMES_IN_FLIGHT]; // One fence per in-flight frame.
+VkBuffer uniformBuffers[FRAMES_IN_FLIGHT]; // Resources are duplicated per in-flight frame
+uint32_t frame = 0;
+
+// Main loop
+while(true) {
+    // Wait until the GPU has finished the last submit that used this slot
+    vkWaitForFences(device, 1, &amp;fences[frame], VK_TRUE, UINT64_MAX);
+    vkResetFences(device, 1, &amp;fences[frame]);
+
+    // Fence signaled: this frame's resources are no longer in use, we can rewrite it
+    memcpy(uniformMapped[frame], &amp;camera, sizeof(camera));
+
+    // Submit a command buffer with the frame's fence. The fence will be signaled when the GPU is done with the command buffer.
+    vkBeginCommandBuffer(commandBuffers[frame], &amp;beginInfo);
+    vkCmdDrawIndexed(commandBuffers[frame], indexCount, 1, 0, 0, 0);
+    vkEndCommandBuffer(commandBuffers[frame]);
+    vkQueueSubmit(queue, 1, &amp;submitInfo, fences[frame]);
+
+    // Increment the frame index.
+    frame = (frame + 1) % FRAMES_IN_FLIGHT;
+}
+</code></pre>
+        </details>
         
-        <h3 style="font-size: 1.1rem; margin-top:2.0rem; height:1rem;">Descriptor sets</h3>
+        <h3 style="font-size: 1.1rem; margin-top:2.5rem; height:1rem;">Descriptor sets</h3>
         <p>
-            <b style="color: #5586a4;">OpenGL</b>: Binding resources is a sequence of individual calls. <code>glBindTexture</code>, <code>glBindBufferBase</code>, <code>glUniform*</code>... each one pokes a global slot, and the driver matches that slot to whatever the currently bound shader expects.
+            <b style="color: #5586a4;">OpenGL</b>: Binding resources is a sequence of individual calls. <code>glBindTexture</code>, <code>glBindBufferBase</code>, <code>glUniform*</code>... each one updates a piece
+            of OpenGL's global state machine: a texture unit, a buffer slot, a uniform value.<br>
+            The currently bound shader then reads from that state.
         </p>
         <p>
-            <b style="color: #ac162c;">Vulkan</b>: Resources are grouped into <b>descriptor sets</b>. A descriptor set is a table of buffers, images and samplers that we bind as a whole. Its layout is declared up front and must match the shader.
-            The usual trick is to split sets by update frequency: one set for data that changes once per frame (camera, lights), another for data that changes per draw or per pass (material textures).
+            <b style="color: #ac162c;">Vulkan</b>: Resources are grouped into <b>descriptor sets</b>. There is no global binding state. 
+            The driver no longer has to reconstruct shader inputs from scattered slots, and we can reuse a set across many draws instead of rebinding everything from scratch.<br>
+            The usual trick is to split sets by update frequency: one set for data that changes once per frame (camera, lights), another for data that changes per draw or per pass (material textures).<br>
             Tiny per-draw values like a model matrix usually go into <b>push constants</b>, a small fast path that doesn't need a descriptor set at all.
         </p>
+        <details>
+            <summary>Click to expand code snippet</summary>
+            <pre><code class="language-cpp">// Write camera data into the frame descriptor set, once per frame
+VkDescriptorSet frameSet;
+memcpy(cameraMapped, &amp;camera, sizeof(camera));
+VkDescriptorBufferInfo cameraInfo{ .buffer = cameraUBO, .range = VK_WHOLE_SIZE };
+VkWriteDescriptorSet frameWrite{
+    .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+    .dstSet = frameSet,
+    .dstBinding = 0,
+    .descriptorCount = 1,
+    .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+    .pBufferInfo = &amp;cameraInfo
+};
+vkUpdateDescriptorSets(device, 1, &amp;frameWrite, 0, nullptr);
+vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, layout, 0, 1, &amp;frameSet, 0, nullptr);
+
+for (auto&amp; pass : passes) {
+    // Write material textures to the pass descriptor set, once per pass
+    VkDescriptorSet passSet = pass.set;
+    VkDescriptorImageInfo albedoInfo{
+        .sampler = pass.sampler,
+        .imageView = pass.albedoView,
+        .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+    };
+    VkWriteDescriptorSet passWrite{
+        .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+        .dstSet = passSet,
+        .dstBinding = 0,
+        .descriptorCount = 1,
+        .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+        .pImageInfo = &amp;albedoInfo
+    };
+    vkUpdateDescriptorSets(device, 1, &amp;passWrite, 0, nullptr);
+    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, layout, 1, 1, &amp;passSet, 0, nullptr);
+
+    for (auto&amp; object : pass.objects) {
+        // Write model matrix to push constants, once per object
+        vkCmdPushConstants(cmd, layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(object.model), &amp;object.model);
+        // Once all bindings are bound to the command buffer, we can issue the draw call.
+        vkCmdDrawIndexed(cmd, object.indexCount, 1, 0, 0, 0);
+    }
+}
+</code></pre>
+        </details>
         
-        <h3 style="font-size: 1.1rem; margin-top:2.0rem; height:1rem;">Image layout</h3>
+        <h3 style="font-size: 1.1rem; margin-top:2.5rem; height:1rem;">Image layout</h3>
         <p>
             <b style="color: #5586a4;">OpenGL</b>: A texture is a texture. We don't tell the driver how we intend to use it at a given moment; it rearranges GPU memory behind the scenes.
         </p>
@@ -149,16 +244,16 @@ vkCreateDevice(physicalDevice, &amp;info, nullptr, &amp;logicalDevice);</code></
             We transition from one layout to another with a <b>barrier</b>. Using an image in the wrong layout is a classic source of validation errors (or silent corruption).
         </p>
         
-        <h3 style="font-size: 1.1rem; margin-top:2.0rem; height:1rem;">Shader compilation</h3>
+        <h3 style="font-size: 1.1rem; margin-top:2.5rem; height:1rem;">Shader compilation</h3>
         <p>
             <b style="color: #5586a4;">OpenGL</b>: We ship GLSL source and compile it at runtime with <code>glCompileShader</code> / <code>glLinkProgram</code>. The driver turns it into GPU machine code, and reloading a shader can be as simple as reading a text file again.
         </p>
         <p>
-            <b style="color: #ac162c;">Vulkan</b>: The API only accepts <b>SPIR-V</b>, an intermediate bytecode. GLSL, HLSL or Slang have to be compiled to SPIR-V first, typically at build time, with a compiler like glslang, DXC or <a class="simple-link" href="https://shader-slang.org/" target="_blank">Slang</a>.
+            <b style="color: #ac162c;">Vulkan</b>: The API only accepts <b>SPIR-V</b>, an intermediate bytecode. GLSL, HLSL or Slang have to be compiled to SPIR-V first, typically at build time, with a compiler like glslang, DXC or Slang.
             The driver then consumes SPIR-V. Startup is more predictable, and we get a single IR across vendors, but the "just compile this string" workflow is gone unless we wrap the compiler ourselves.
         </p>
 
-        <h2 style="margin-top:3.2rem;">Basic Vulkan setup</h2>
+        <h2 style="margin-top:4.0rem;">Basic Vulkan setup</h2>
         <p>To get started, you'll need to install the Vulkan SDK. It will provide you some tools like validation layers (API error checking), a SPIR-V compiler, etc.
             Then I would advise using the following libraries:
             <ul>
@@ -173,7 +268,7 @@ vkCreateDevice(physicalDevice, &amp;info, nullptr, &amp;logicalDevice);</code></
             </ul>
         </p>
 
-        <h2 style="margin-top:3.2rem;">Architecture</h2>
+        <h2 style="margin-top:4.0rem;">Architecture</h2>
         <p>The rest of the engine shouldn't have to think in Vulkan objects. In nebula I kept an OpenGL-shaped API on top of an explicit Vulkan backend.</p>
         <p>A singleton context owns the instance, the device, the swapchain, and two <b>frames in flight</b>. Each frame has its own command buffer, fence, and a deletion queue: when a buffer or image is destroyed, it is only actually released after that frame's fence signals. That is how resource lifetime is handled in practice.</p>
         <p>Rendering goes through a small set of functions: <code>beginFrame</code> / <code>endFrame</code>, <code>drawMesh</code>, <code>drawFullscreen</code>, <code>dispatch</code>. A <code>Program</code> is still "the shaders you bind", except that behind it we cache <b>pipeline variants</b> (blend mode, vertex layout, attachment formats). Raster state that used to be <code>glEnable</code> calls is either baked into the pipeline or set as dynamic state.</p>
@@ -187,7 +282,7 @@ vkCreateDevice(physicalDevice, &amp;info, nullptr, &amp;logicalDevice);</code></
         <p>Render passes use Vulkan 1.3 <b>dynamic rendering</b>, so there is no <code>VkRenderPass</code> / <code>VkFramebuffer</code> object to manage. A thin RAII helper begins rendering, runs the draws, and transitions the attachments to <code>SHADER_READ_ONLY_OPTIMAL</code> so the next pass can sample them. Textures track their current layout, because as we saw, Vulkan will not do it for you.</p>
         <p>Memory allocation is delegated to VMA, function loading to volk, shaders compiled from Slang to SPIR-V at build time. The OpenGL-era libraries (glfw, glm, stb, tinygltf, imgui) stay. The result is that scene code and materials still look close to the old engine, while the backend is explicit about queues, layouts, and lifetimes.</p>
 
-        <h2 style="margin-top:3.2rem;">Further reading</h2>
+        <h2 style="margin-top:4.0rem;">Further reading</h2>
         <p>If you want to dig further, I recommend the following resources:
         <ul>
             <li><a class="simple-link" href="https://vulkan-tutorial.com/Introduction" target="_blank">vulkan-tutorial.com</a>, a complete walkthrough, though somewhat outdated</li>
