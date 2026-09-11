@@ -80,7 +80,7 @@
 
         <h3 style="font-size: 1.1rem; margin-top:2.5rem; height:1rem;">Device choice</h3>
         <p>
-            <b style="color: #5586a4;">OpenGL</b>: You don't choose which GPU to use, the driver decides for you. It is certainly possible to influence this choice, but the API doesn't make GPU selection a central part of the programming model.
+            <b style="color: #5586a4;">OpenGL</b>: We don't choose which GPU to use, the driver decides for us. It is certainly possible to influence this choice, but the API doesn't make GPU selection a central part of the programming model.
         </p>
         <p>
             <b style="color: #ac162c;">Vulkan</b>: We enumerate the available <b>physical devices</b> (GPUs), inspect their capabilities, and then select one to create a <b>logical device</b> from it.
@@ -123,13 +123,13 @@ vkCreateDevice(physicalDevice, &amp;info, nullptr, &amp;logicalDevice);
         </p>
         <details>
             <summary>Click to expand code snippet</summary>
-            <pre><code class="language-cpp">// Record commands into a command buffer
+            <pre><code class="language-cpp">// Record commands into a command buffer, nothing is drawn yet
 vkBeginCommandBuffer(commandBuffer, &amp;beginInfo);
 vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 vkCmdDrawIndexed(commandBuffer, indexCount, 1, 0, 0, 0);
 vkEndCommandBuffer(commandBuffer);
 
-// Submit the command buffer to a queue
+// Submit the command buffer to a queue, rendering will start now
 vkQueueSubmit(queue, 1, &amp;submitInfo, fence);
 </code></pre>
         </details>
@@ -246,11 +246,11 @@ for (auto&amp; pass : passes) {
         
         <h3 style="font-size: 1.1rem; margin-top:2.5rem; height:1rem;">Shader compilation</h3>
         <p>
-            <b style="color: #5586a4;">OpenGL</b>: We ship GLSL source and compile it at runtime with <code>glCompileShader</code> / <code>glLinkProgram</code>. The driver turns it into GPU machine code, and reloading a shader can be as simple as reading a text file again.
+            <b style="color: #5586a4;">OpenGL</b>: We ship GLSL source and compile it at runtime with <code>glCompileShader</code> / <code>glLinkProgram</code>. The driver turns it into GPU machine code, which means the generated code heavily depends on the user's hardware.
         </p>
         <p>
-            <b style="color: #ac162c;">Vulkan</b>: The API only accepts <b>SPIR-V</b>, an intermediate bytecode. GLSL, HLSL or Slang have to be compiled to SPIR-V first, typically at build time, with a compiler like glslang, DXC or Slang.
-            The driver then consumes SPIR-V. Startup is more predictable, and we get a single IR across vendors, but the "just compile this string" workflow is gone unless we wrap the compiler ourselves.
+            <b style="color: #ac162c;">Vulkan</b>: The API only accepts <b>SPIR-V</b>, an intermediate bytecode. We can still write our shaders in GLSL (or HLSL), but they are compiled to SPIR-V as part of our build pipeline rather than by the Vulkan driver at runtime.
+            This makes shader compilation more explicit and predictable.
         </p>
 
         <h2 style="margin-top:4.0rem;">Basic Vulkan setup</h2>
