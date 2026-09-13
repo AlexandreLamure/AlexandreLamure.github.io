@@ -4,20 +4,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Porting a small OpenGL engine to Vulkan.">
+    <meta name="description" content="Porting a small OpenGL engine to Vulkan — first principles.">
     <meta name="theme-color" content="#ffffff">
 
     <!-- Open Graph / Facebook -->
+    <meta property="og:site_name" content="Alexandre Lamure">
+    <meta property="og:locale" content="en_US">
     <meta property="og:url" content="https://alexandrelamure.github.io/graphics-posts/from-opengl-to-vulkan.html">
     <meta property="og:title" content="From OpenGL to Vulkan | Alexandre Lamure">
-    <meta property="og:description" content="Porting a small OpenGL engine to Vulkan.">
-    <meta property="og:type" content="website">
-    <meta property="og:image" content="https://alexandrelamure.github.io/resources/profile-picture.jpg">
+    <meta property="og:description" content="Porting a small OpenGL engine to Vulkan — first principles.">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2026-09-13">
+    <meta property="article:author" content="Alexandre Lamure">
+    <meta property="og:image" content="https://alexandrelamure.github.io/resources/graphics-posts/from-opengl-to-vulkan/thumbnail.jpg">
+    <meta property="og:image:alt" content="From OpenGL to Vulkan thumbnail">
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="From OpenGL to Vulkan | Alexandre Lamure">
-    <meta name="twitter:description" content="Porting a small OpenGL engine to Vulkan.">
-    <meta name="twitter:image" content="https://alexandrelamure.github.io/resources/profile-picture.jpg">
+    <meta name="twitter:description" content="Porting a small OpenGL engine to Vulkan — first principles.">
+    <meta name="twitter:image" content="https://alexandrelamure.github.io/resources/graphics-posts/from-opengl-to-vulkan/thumbnail.jpg">
+    <meta name="twitter:image:alt" content="From OpenGL to Vulkan thumbnail">
 
     <title>From OpenGL to Vulkan | Alexandre Lamure</title>
     <link rel="canonical" href="https://alexandrelamure.github.io/graphics-posts/from-opengl-to-vulkan.html">
@@ -29,7 +35,26 @@
     <!-- Syntax highlighting -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/prismjs/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          "headline": "From OpenGL to Vulkan",
+          "description": "Porting a small OpenGL engine to Vulkan — first principles.",
+          "image": "https://alexandrelamure.github.io/resources/graphics-posts/from-opengl-to-vulkan/thumbnail.jpg",
+          "datePublished": "2026-09-13",
+          "author": {
+            "@type": "Person",
+            "name": "Alexandre Lamure",
+            "url": "https://alexandrelamure.github.io/"
+          },
+          "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://alexandrelamure.github.io/graphics-posts/from-opengl-to-vulkan.html"
+          }
+        }
+    </script>
 </head>
 
 <body>
@@ -49,30 +74,29 @@
         <p><a class="btn-small" href="../graphics.html"><i class="fas fa-arrow-left"></i>Back to graphics</a></p>
 
         <h1>From OpenGL to Vulkan</h1>
-        <div class="graphics-post-date">September 13, 2026</div>
+        <div class="graphics-post-date"><time datetime="2026-09-13">September 13, 2026</time></div>
         
-        <p>I recently ported a basic OpenGL engine to Vulkan (see <a class="simple-link" href="https://github.com/AlexandreLamure/nebula" target="_blank">nebula</a>).<br>
-        There are already plenty of great resources talking about transitioning from OpenGL to Vulkan:
+        <p>I recently ported a basic OpenGL engine to Vulkan (see <a class="simple-link" href="https://github.com/AlexandreLamure/nebula" target="_blank" rel="noopener noreferrer">nebula</a>).<br>
+        There are already plenty of great resources on transitioning from OpenGL to Vulkan:
         <ul>
-            <li><a class="simple-link" href="https://developer.nvidia.com/transitioning-opengl-vulkan" target="_blank">Transitioning from OpenGL to Vulkan by NVIDIA</a></li>
-            <li><a class="simple-link" href="https://www.youtube.com/watch?v=yHNEecWwFOc" target="_blank">Vulkanised 2023: Use "bindless" to quickly port "bindful" OpenGL apps to Vulkan</a></li>
-            <li><a class="simple-link" href="https://anki3d.org/porting-anki-to-vulkan/" target="_blank">The journey of porting AnKi to Vulkan</a></li>
-            <li><a class="simple-link" href="https://blog.nap-framework.tech/d0/dfd/md_articles_001_nap_opengl_to_vulkan" target="_blank">NAPTECH: OpenGL to Vulkan</a></li>
+            <li><a class="simple-link" href="https://developer.nvidia.com/transitioning-opengl-vulkan" target="_blank" rel="noopener noreferrer">Transitioning from OpenGL to Vulkan by NVIDIA</a></li>
+            <li><a class="simple-link" href="https://www.youtube.com/watch?v=yHNEecWwFOc" target="_blank" rel="noopener noreferrer">Vulkanised 2023: Use "bindless" to quickly port "bindful" OpenGL apps to Vulkan</a></li>
+            <li><a class="simple-link" href="https://anki3d.org/porting-anki-to-vulkan/" target="_blank" rel="noopener noreferrer">The journey of porting AnKi to Vulkan</a></li>
+            <li><a class="simple-link" href="https://blog.nap-framework.tech/d0/dfd/md_articles_001_nap_opengl_to_vulkan" target="_blank" rel="noopener noreferrer">NAPTECH: OpenGL to Vulkan</a></li>
         </ul>
-        But I wanted to modestly contribute. The goal here is not to provide a detailed guide, but rather to offer a few-minutes read to introduce the first principles.
+        But I wanted to modestly contribute. The goal here is not to provide a detailed guide, but rather to offer a few-minute read covering the core principles.
         Many people still learn graphics programming with OpenGL, and feel overwhelmed by the Vulkan API. I hope this post can help them get started.
         </p>
 
 
         <h2 style="margin-top:4.0rem;">What doesn't change</h2>
-        <p>The core ideas of OpenGL are still valid in Vulkan.
+        <p>The core ideas of OpenGL are still valid in Vulkan.</p>
         <ul>
             <li>We prepare resources like <b>buffers</b> and <b>textures</b> on the CPU, and <b>upload</b> them to the GPU.</li>
             <li>We can draw things through a <b>rasterization</b> pipeline.</li>
             <li>This pipeline is configured by <b>pipeline states</b> (blending mode, depth test, backface culling, etc.).</li>
             <li>We use <b>shaders</b> (vertex, fragment, compute...) to program what happens on the GPU.</li>
         </ul>
-        </p>
 
 
         <h2 style="margin-top:4.0rem;">What does change</h2>
@@ -109,8 +133,8 @@ for (auto candidate : physicalDevices) {
 VkDevice logicalDevice;
 vkCreateDevice(physicalDevice, &amp;logicalDevice);
 </code></pre>
-        <p>NB: The pseudo-code shown here won't compile, I simplified it for the sake of readability.
-            If you want to actually implement this, you should use the <a class="simple-link" href="https://docs.vulkan.org/spec/latest/index.html" target="_blank">Vulkan documentation</a> and the links mentioned at the end of this blog post.
+        <p>NB: This snippet is simplified and won't compile. If you want to actually implement this,
+            you should use the <a class="simple-link" href="https://docs.vulkan.org/spec/latest/index.html" target="_blank" rel="noopener noreferrer">Vulkan documentation</a> and the links mentioned at the end of this blog post.
         </p>
         </details>
 
@@ -122,7 +146,7 @@ vkCreateDevice(physicalDevice, &amp;logicalDevice);
         <p>
             <b style="color: #ac162c;">Vulkan</b>: This mechanism isn't hidden anymore. We record a list of commands into a <b>command buffer</b>, then submit that command buffer to a queue. Nothing runs until we submit it.<br>
             We're also responsible for expressing dependencies ourselves using barriers, semaphores and fences. It's more bookkeeping, but the payoff is that the driver has much less guesswork to do at runtime, and we control how work is organized and submitted.<br>
-            To go further, Vulkan allows us to fill command buffers with multiple threads, which is useful when CPU work gets heavy. We can also use multiple commad queues to run different types of work in parallel on the GPU (e.g. compute, graphics, memory transfer).
+            To go further, Vulkan allows us to fill command buffers with multiple threads, which is useful when CPU work gets heavy. We can also use multiple command queues to run different types of work in parallel on the GPU (e.g. compute, graphics, memory transfer).
         </p>
         <details>
             <summary>Click to expand pseudo-code snippet</summary>
@@ -143,7 +167,7 @@ vkQueueSubmit(queue, fence);
             The driver takes care of keeping the underlying objects alive for as long as necessary.
         </p>
         <p>
-            <b style="color: #ac162c;">Vulkan</b>: The resource lifetime is our responsibility. Destroying a buffer while the GPU still references it means trouble.
+            <b style="color: #ac162c;">Vulkan</b>: Resource lifetime is our responsibility. Destroying a buffer while the GPU still references it means trouble.
             The CPU and GPU work asynchronously, so we use <b>fences</b> to signal when the GPU has finished using a resource.<br>
             In practice, most engines don't check this per-resource. They keep a few <b>frames in flight</b>: while the GPU is still rendering frame N,
             the CPU is already recording frame N+1. Each in-flight frame has its own command buffers and a fence.
@@ -153,7 +177,7 @@ vkQueueSubmit(queue, fence);
             <summary>Click to expand diagram</summary>
             <p>This diagram illustrates the lifecycle of an engine with 2 frames in flight.<br>
                 The fence #0 synchronizes frames #0, #2, #4, etc. After the CPU submits the commands for frame #0, the GPU begins processing them. Once the GPU has finished, it signals fence #0, allowing the CPU to reuse the resources associated with frame #0 for frame #2.<br>
-                Meanwhile, the fence #1 (not shown here) ensures the proper scheduling of the frames #1, #3, #5, etc.
+                Meanwhile, the fence #1 (not shown here) ensures the proper scheduling of frames #1, #3, #5, etc.
             </p>
             <img src="../resources/graphics-posts/from-opengl-to-vulkan/vulkan-scheduling.jpg" alt="Frames in flight and fences" style="width:140%;margin-left:-20%;height:auto;display:block;margin-top:1rem;">
         </details>
@@ -282,18 +306,18 @@ vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
 
         <h2 style="margin-top:4.0rem;">Basic Vulkan setup</h2>
         <p>To get started, you'll need to install the Vulkan SDK. It will provide you with some tools like validation layers (API error checking), a SPIR-V compiler, etc.
-            Then I would advise using the following libraries:
-            <ul>
-                <li><a class="simple-link" href="https://github.com/zeux/volk" target="_blank">volk</a> for function loading. It replaces glad or glew for OpenGL.</li>
-                <li><a class="simple-link" href="https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator" target="_blank">vma</a> to simplify low-level memory management. That part was completely hidden in OpenGL.</li>
-                <li><a class="simple-link" href="https://github.com/charles-lunarg/vk-bootstrap" target="_blank">vk-bootstrap</a> can be a good addition if you want to reduce Vulkan's initialization boilerplate.</li>
-                <li><a class="simple-link" href="https://github.com/glfw/glfw" target="_blank">glfw</a>,
-                    <a class="simple-link" href="https://github.com/g-truc/glm" target="_blank">glm</a>, 
-                    <a class="simple-link" href="https://github.com/nothings/stb" target="_blank">stb</a>, 
-                    <a class="simple-link" href="https://github.com/syoyo/tinygltf" target="_blank">tinygltf</a> and
-                    <a class="simple-link" href="https://github.com/ocornut/imgui" target="_blank">imgui</a>, which you may have used in OpenGL, still work great with Vulkan.</li>
-            </ul>
+            Then I recommend these libraries:
         </p>
+        <ul>
+            <li><a class="simple-link" href="https://github.com/zeux/volk" target="_blank" rel="noopener noreferrer">volk</a> for function loading. It replaces glad or glew for OpenGL.</li>
+            <li><a class="simple-link" href="https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator" target="_blank" rel="noopener noreferrer">VMA</a> to simplify low-level memory management. That part was completely hidden in OpenGL.</li>
+            <li><a class="simple-link" href="https://github.com/charles-lunarg/vk-bootstrap" target="_blank" rel="noopener noreferrer">vk-bootstrap</a> can be a good addition if you want to reduce Vulkan's initialization boilerplate.</li>
+            <li><a class="simple-link" href="https://github.com/glfw/glfw" target="_blank" rel="noopener noreferrer">GLFW</a>,
+                <a class="simple-link" href="https://github.com/g-truc/glm" target="_blank" rel="noopener noreferrer">GLM</a>, 
+                <a class="simple-link" href="https://github.com/nothings/stb" target="_blank" rel="noopener noreferrer">stb</a>, 
+                <a class="simple-link" href="https://github.com/syoyo/tinygltf" target="_blank" rel="noopener noreferrer">tinygltf</a> and
+                <a class="simple-link" href="https://github.com/ocornut/imgui" target="_blank" rel="noopener noreferrer">ImGui</a>, which you may have used in OpenGL, still work great with Vulkan.</li>
+        </ul>
 
         <h2 style="margin-top:4.0rem;">Architecture</h2>
         <p>Vulkan forces us to build a proper architecture, even for small engines. Skip it, and you'll quickly end up with a slow, messy, bug-prone codebase — the API is less forgiving than OpenGL.<br>
@@ -308,19 +332,18 @@ vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
         This allows us to avoid binding a new descriptor set for each object — something that hurts performance at scale. Once every texture and buffer is available on the GPU, drawing an object simply means fetching the giant array at the right index.
         This lightweight index can be passed as a push constant.
         </p>
-        <p>Regarding image layout transitions, the cleanest way is to build a <b>render graph</b> (a.k.a. "frame graph"). Rather than manually inserting barriers between every pass, we declare each pass along with the images it reads from and writes to;
+        <p>For image layout transitions, the cleanest approach is to build a <b>render graph</b> (a.k.a. "frame graph"). Rather than manually inserting barriers between every pass, we declare each pass along with the images it reads from and writes to;
             the graph figures out the dependency order and inserts the right layout transitions and barriers for us. Then we can simply declare passes without worrying about synchronization. <br>
             This abstraction layer can even be used to optimize the rendering pipeline, for example by minimizing the number of barriers and reusing a texture from a previous pass instead of allocating a new one.
         </p>
 
         <h2 style="margin-top:4.0rem;">Further reading</h2>
-        <p>If you want to actually implement a Vulkan engine, I recommend the following resources:
+        <p>If you want to actually implement a Vulkan engine, I recommend the following resources:</p>
         <ul>
-            <li><a class="simple-link" href="https://vulkan-tutorial.com/Introduction" target="_blank">vulkan-tutorial.com</a>, a complete walkthrough, though somewhat outdated</li>
-            <li><a class="simple-link" href="https://vkguide.dev/" target="_blank">vkguide.dev</a>, a more modern guide</li>
-            <li><a class="simple-link" href="https://howtovulkan.com/" target="_blank">howtovulkan.com</a>, emphasis on modern Vulkan 1.3 features</li>
+            <li><a class="simple-link" href="https://vulkan-tutorial.com/Introduction" target="_blank" rel="noopener noreferrer">vulkan-tutorial.com</a>, a complete walkthrough, though somewhat outdated</li>
+            <li><a class="simple-link" href="https://vkguide.dev/" target="_blank" rel="noopener noreferrer">vkguide.dev</a>, a more modern guide</li>
+            <li><a class="simple-link" href="https://howtovulkan.com/" target="_blank" rel="noopener noreferrer">howtovulkan.com</a>, with an emphasis on modern Vulkan 1.3 features</li>
         </ul>
-        </p>
 
         <p><a class="btn-small" style="margin-top:2rem;" href="../graphics.html"><i class="fas fa-arrow-left"></i>Back to graphics</a></p>
     </main>
