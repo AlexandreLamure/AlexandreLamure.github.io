@@ -64,6 +64,19 @@ nav {
     margin-top: 6px;
 }
 
+/* Logo: a simple text for now */
+.logo {
+    text-decoration: none;
+    color: inherit;
+}
+/* Avoid color changes on visited link */
+.logo:visited,
+.logo:hover,
+.logo:active {
+    color: inherit;
+    text-decoration: none;
+}
+
 /* 3. Main Layout Containers */
 .content {
     max-width: 800px;
