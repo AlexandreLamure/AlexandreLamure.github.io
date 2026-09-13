@@ -49,7 +49,7 @@
         <p><a class="btn-small" href="../graphics.html"><i class="fas fa-arrow-left"></i>Back to graphics</a></p>
 
         <h1>From OpenGL to Vulkan</h1>
-        <div class="graphics-post-date">September 6, 2026</div>
+        <div class="graphics-post-date">September 13, 2026</div>
         
         <p>I recently ported a basic OpenGL engine to Vulkan (see <a class="simple-link" href="https://github.com/AlexandreLamure/nebula" target="_blank">nebula</a>).<br>
         There are already plenty of great resources talking about transitioning from OpenGL to Vulkan:
@@ -116,12 +116,13 @@ vkCreateDevice(physicalDevice, &amp;logicalDevice);
 
         <h3 style="font-size: 1.1rem; margin-top:2.5rem; height:1rem;">Scheduling</h3>
         <p>
-            <b style="color: #5586a4;">OpenGL</b>: GPU scheduling is largely managed by the driver. Beginners tend to think that commands like <code>glBindBuffer</code> or <code>glDrawElements</code> are executed immediately,
+            <b style="color: #5586a4;">OpenGL</b>: GPU scheduling is largely managed by the driver. Beginners tend to think that commands like <code>glBind*</code> or <code>glDraw*</code> are executed immediately,
             because the API is designed to give that impression. In reality, they are queued and executed later. They might even get reordered, as OpenGL automatically infers dependencies and optimizes the workflow.
         </p>
         <p>
             <b style="color: #ac162c;">Vulkan</b>: This mechanism isn't hidden anymore. We record a list of commands into a <b>command buffer</b>, then submit that command buffer to a queue. Nothing runs until we submit it.<br>
-            We're also responsible for expressing dependencies ourselves using barriers, semaphores and fences. It's more bookkeeping, but the payoff is that the driver has much less guesswork to do at runtime, and we control how work is organized and submitted.
+            We're also responsible for expressing dependencies ourselves using barriers, semaphores and fences. It's more bookkeeping, but the payoff is that the driver has much less guesswork to do at runtime, and we control how work is organized and submitted.<br>
+            To go further, Vulkan allows us to fill command buffers with multiple threads, which is useful when CPU work gets heavy. We can also use multiple commad queues to run different types of work in parallel on the GPU (e.g. compute, graphics, memory transfer).
         </p>
         <details>
             <summary>Click to expand pseudo-code snippet</summary>
@@ -143,7 +144,7 @@ vkQueueSubmit(queue, fence);
         </p>
         <p>
             <b style="color: #ac162c;">Vulkan</b>: The resource lifetime is our responsibility. Destroying a buffer while the GPU still references it means trouble.
-            The CPU and GPU work <b>asynchronously</b>, so we use <b>fences</b> to signal when the GPU has finished using a resource.<br>
+            The CPU and GPU work asynchronously, so we use <b>fences</b> to signal when the GPU has finished using a resource.<br>
             In practice, most engines don't check this per-resource. They keep a few <b>frames in flight</b>: while the GPU is still rendering frame N,
             the CPU is already recording frame N+1. Each in-flight frame has its own command buffers and a fence.
             We only destroy or reuse a resource once that frame's fence signals, so we know the GPU is done with it.
