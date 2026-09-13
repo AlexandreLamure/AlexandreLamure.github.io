@@ -109,6 +109,9 @@ for (auto candidate : physicalDevices) {
 VkDevice logicalDevice;
 vkCreateDevice(physicalDevice, &amp;logicalDevice);
 </code></pre>
+        <p>NB: The pseudo-code shown here won't compile, I simplified it for the sake of readability.
+            If you want to actually implement this, you should use the <a class="simple-link" href="https://docs.vulkan.org/spec/latest/index.html" target="_blank">Vulkan documentation</a> and the links mentioned at the end of this blog post.
+        </p>
         </details>
 
         <h3 style="font-size: 1.1rem; margin-top:2.5rem; height:1rem;">Scheduling</h3>
@@ -145,10 +148,17 @@ vkQueueSubmit(queue, fence);
             the CPU is already recording frame N+1. Each in-flight frame has its own command buffers and a fence.
             We only destroy or reuse a resource once that frame's fence signals, so we know the GPU is done with it.
         </p>
-        <p>TODO: add a schema with frames in flight and fences (submitted, signaled, in use)</p>
+        <details>
+            <summary>Click to expand diagram</summary>
+            <p>This diagram illustrates the lifecycle of an engine with 2 frames in flight.<br>
+                The fence #0 synchronizes frames #0, #2, #4, etc. After the CPU submits the commands for frame #0, the GPU begins processing them. Once the GPU has finished, it signals fence #0, allowing the CPU to reuse the resources associated with frame #0 for frame #2.<br>
+                Meanwhile, the fence #1 (not shown here) ensures the proper scheduling of the frames #1, #3, #5, etc.
+            </p>
+            <img src="../resources/graphics-posts/from-opengl-to-vulkan/vulkan-scheduling.jpg" alt="Frames in flight and fences" style="width:140%;margin-left:-20%;height:auto;display:block;margin-top:1rem;">
+        </details>
         <details>
             <summary>Click to expand pseudo-code snippet</summary>
-            <pre><code class="language-cpp">constexpr uint32_t FRAMES_IN_FLIGHT = 2;
+            <pre><code class="language-cpp">constexpr uint32_t FRAMES_IN_FLIGHT = 2; // Number of frames in flight
 VkCommandBuffer commandBuffers[FRAMES_IN_FLIGHT];
 VkFence fences[FRAMES_IN_FLIGHT]; // One fence per in-flight frame.
 VkBuffer uniformBuffers[FRAMES_IN_FLIGHT]; // Resources are duplicated per in-flight frame
