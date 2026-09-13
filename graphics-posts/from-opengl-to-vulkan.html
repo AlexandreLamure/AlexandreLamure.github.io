@@ -102,7 +102,7 @@
         <h2 style="margin-top:4.0rem;">What does change</h2>
         <p>OpenGL is a black box: many concepts are hidden and simplified. For the sake of performance and flexibility, Vulkan makes them explicit.</p>
 
-        <h3 style="font-size: 1.1rem; margin-top:2.5rem; height:1rem;">Device choice</h3>
+        <h3 style="font-size: 1.1rem; margin-top:3.0rem; line-height:0.5rem;">Device choice</h3>
         <p>
             <b style="color: #5586a4;">OpenGL</b>: We don't choose which GPU to use, the driver decides for us. It is certainly possible to influence this choice, but the API doesn't make GPU selection a central part of the programming model.
         </p>
@@ -138,7 +138,7 @@ vkCreateDevice(physicalDevice, &amp;logicalDevice);
         </p>
         </details>
 
-        <h3 style="font-size: 1.1rem; margin-top:2.5rem; height:1rem;">Scheduling</h3>
+        <h3 style="font-size: 1.1rem; margin-top:3.0rem; line-height:0.5rem;">Scheduling</h3>
         <p>
             <b style="color: #5586a4;">OpenGL</b>: GPU scheduling is largely managed by the driver. Beginners tend to think that commands like <code>glBind*</code> or <code>glDraw*</code> are executed immediately,
             because the API is designed to give that impression. In reality, they are queued and executed later. They might even get reordered, as OpenGL automatically infers dependencies and optimizes the workflow.
@@ -161,7 +161,7 @@ vkQueueSubmit(queue, fence);
 </code></pre>
         </details>
 
-        <h3 style="font-size: 1.1rem; margin-top:2.5rem; height:1rem;">Resource lifetime</h3>
+        <h3 style="font-size: 1.1rem; margin-top:3.0rem; line-height:0.5rem;">Resource lifetime</h3>
         <p>
             <b style="color: #5586a4;">OpenGL</b>: We can delete a buffer after issuing a draw call using it, and OpenGL will make sure that the deletion doesn't happen while the GPU is still using the buffer.
             The driver takes care of keeping the underlying objects alive for as long as necessary.
@@ -211,7 +211,7 @@ while(true) {
 </code></pre>
         </details>
         
-        <h3 style="font-size: 1.1rem; margin-top:2.5rem; height:1rem;">Descriptor sets</h3>
+        <h3 style="font-size: 1.1rem; margin-top:3.0rem; line-height:0.5rem;">Descriptor sets</h3>
         <p>
             <b style="color: #5586a4;">OpenGL</b>: Binding resources is a sequence of individual calls. <code>glBindTexture</code>, <code>glBindBufferBase</code>, <code>glUniform*</code>... each one updates a piece
             of OpenGL's global state machine: a texture unit, a buffer slot, a uniform value.<br>
@@ -272,7 +272,7 @@ for (auto&amp; pass : passes) {
 </code></pre>
         </details>
         
-        <h3 style="font-size: 1.1rem; margin-top:2.5rem; height:1rem;">Image layout</h3>
+        <h3 style="font-size: 1.1rem; margin-top:3.0rem; line-height:0.5rem;">Image layout</h3>
         <p>
             <b style="color: #5586a4;">OpenGL</b>: A texture is a texture. We don't tell the driver how we intend to use it at a given moment; it rearranges GPU memory behind the scenes.
         </p>
@@ -295,7 +295,7 @@ vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
 </code></pre>
         </details>
         
-        <h3 style="font-size: 1.1rem; margin-top:2.5rem; height:1rem;">Shader compilation</h3>
+        <h3 style="font-size: 1.1rem; margin-top:3.0rem; line-height:0.5rem;">Shader compilation</h3>
         <p>
             <b style="color: #5586a4;">OpenGL</b>: We ship GLSL source and compile it at runtime with <code>glCompileShader</code> / <code>glLinkProgram</code>. The driver turns it into GPU machine code, which means the generated code heavily depends on the user's hardware.
         </p>
@@ -327,7 +327,8 @@ vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
             Each of those two frames gets its own command buffer and fence, plus a <b>deletion queue</b>: instead of destroying a resource immediately, we push its handle into that frame's queue,
             and it's only actually released once that frame's fence signals (i.e. once we know the GPU is done using it).
         </p>
-        <p>To bind resources, a basic setup would be to use a descriptor set for the frame data (camera and lights) and simply rely on <code>vkCmdPushConstants</code> for the rest (material textures, model matrices, etc.).<br>
+        <p>To bind resources, a basic setup would be to use a descriptor set for the frame data (camera and lights) and another one for the pass data (material textures, model matrices, etc.).
+            As a starter I would advise managing the pass descriptor set through <code>vkCmdPushDescriptorSet</code>. This Vulkan 1.4 feature allows you to update your resources on-the-fly, in a simple inlined manner.<br>
         If you wish to go further, you should learn about <b>bindless rendering</b>. The idea is to bind a single descriptor set containing a giant array of all the resources we need to draw the entire frame.
         This allows us to avoid binding a new descriptor set for each object — something that hurts performance at scale. Once every texture and buffer is available on the GPU, drawing an object simply means fetching the giant array at the right index.
         This lightweight index can be passed as a push constant.
