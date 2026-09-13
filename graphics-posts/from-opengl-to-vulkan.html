@@ -245,20 +245,21 @@ for (auto&amp; pass : passes) {
     VkDescriptorImageInfo albedoInfo{ .imageView = pass.albedoView };
     VkDescriptorImageInfo normalInfo{ .imageView = pass.normalView };
     VkDescriptorSet passSet = pass.set;
-    VkWriteDescriptorSet passWrites[] =
-    {
-        .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-        .dstSet = passSet,
-        .dstBinding = 0,
-        .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-        .pImageInfo = &amp;albedoInfo
-    },
-    {
-        .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-        .dstSet = passSet,
-        .dstBinding = 1,
-        .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-        .pImageInfo = &amp;normalInfo
+    VkWriteDescriptorSet passWrites[] = {
+        {
+            .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+            .dstSet = passSet,
+            .dstBinding = 0,
+            .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+            .pImageInfo = &amp;albedoInfo
+        },
+        {
+            .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+            .dstSet = passSet,
+            .dstBinding = 1,
+            .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+            .pImageInfo = &amp;normalInfo
+        }
     };
     vkUpdateDescriptorSets(device, std::size(passWrites), passWrites);
     vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, 1, &amp;passSet);
