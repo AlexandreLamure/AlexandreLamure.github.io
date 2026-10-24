@@ -470,7 +470,8 @@ body > :not(#bg-shader-layer) {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    #bg-shader-layer {
+    #bg-shader-layer,
+    #bg-canvas {
         display: none;
     }
 }
