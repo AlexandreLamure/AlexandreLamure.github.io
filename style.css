@@ -504,7 +504,8 @@ body > :not(#bg-shader-layer) {
     margin: 0;
 }
 
-.teaching-showcase-item img {
+.teaching-showcase-item img,
+.teaching-showcase-item video {
     height: 100%;
     width: auto;
     display: block;
@@ -541,7 +542,8 @@ body > :not(#bg-shader-layer) {
     opacity: 0.95;
 }
 
-.teaching-showcase-item:hover img {
+.teaching-showcase-item:hover img,
+.teaching-showcase-item:hover video {
     filter: brightness(0.55) saturate(0.95);
     transform: scale(1.02);
 }
