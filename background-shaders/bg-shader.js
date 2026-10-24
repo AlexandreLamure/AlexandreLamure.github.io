@@ -119,7 +119,7 @@ void main() {
             canvas.width = Math.max(1, Math.floor(w * dpr * scale));
             canvas.height = Math.max(1, Math.floor(h * dpr * scale));
             gl.viewport(0, 0, canvas.width, canvas.height);
-            gl.uniform2f(uResolution, w * scale, h * scale);
+            gl.uniform2f(uResolution, canvas.width, canvas.height);
         }
         resize();
         window.addEventListener('resize', resize, { passive: true });
