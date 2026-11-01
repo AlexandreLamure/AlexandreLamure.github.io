@@ -291,7 +291,7 @@ nav {
 }
 
 /* Music showcase grid (wider than .content)
-   Large: centered 3-2-3 | Narrow: centered 2-1-2-1-2 */
+   Large: centered 3-2-3 | Narrow: centered 2-1-2-1-2 | Mobile: 2-2-2-2 */
 .music-showcase {
     --showcase-gap: 0.5rem;
     display: grid;
@@ -335,6 +335,15 @@ nav {
         grid-column: 1 / -1;
         width: calc((100% - var(--showcase-gap)) / 2);
         justify-self: center;
+    }
+}
+
+/* Mobile: plain 2-2-2-2 */
+@media (max-width: 1200px) {
+    .music-showcase > :nth-child(3),
+    .music-showcase > :nth-child(6) {
+        grid-column: auto;
+        width: auto;
     }
 }
 
