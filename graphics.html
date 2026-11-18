@@ -34,7 +34,7 @@
 <body>
     <header>
         <nav>
-            <div class="logo">Alexandre Lamure</div>
+            <a href="index.html" class="logo">Alexandre Lamure</a>
             <ul class="nav-links">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="graphics.html" class="active">Graphics</a></li>
@@ -46,10 +46,21 @@
 
     <main class="content">
         <h1>Graphics blog</h1>
-        <p>I am a 3D graphics software engineer, working at Quantic Dream on <a class="simple-link" href="https://www.youtube.com/watch?v=4cJpiOPKH14" target="_blank" rel="noopener noreferrer">Star Wars Eclipse</a> and <a class="simple-link" href="https://www.youtube.com/watch?v=KU--4IVoDHo" target="_blank" rel="noopener noreferrer">Spellcasters Chronicles</a>.</p>
+        <p>I am a 3D graphics software engineer, working at Quantic Dream on <a class="simple-link" href="https://www.youtube.com/watch?v=4cJpiOPKH14" target="_blank" rel="noopener noreferrer">Star Wars Eclipse</a>.</p>
 
         <section class="graphics-posts">
             <h2>Posts</h2>
+
+            <div class="graphics-post-list">
+                <a class="graphics-post-item" href="graphics-posts/from-opengl-to-vulkan.html" target="_self">
+                    <img class="graphics-post-thumb" src="resources/graphics-posts/from-opengl-to-vulkan/thumbnail.jpg" alt="From OpenGL to Vulkan">
+                    <div class="graphics-post-content">
+                        <h3 class="graphics-post-title">From OpenGL to Vulkan</h3>
+                        <div class="graphics-post-date">September 13, 2026</div>
+                        <p class="graphics-post-excerpt">First principles of porting a small OpenGL engine to Vulkan.</p>
+                    </div>
+                </a>
+            </div>
 
             <div class="graphics-post-list">
                 <a class="graphics-post-item" href="graphics-posts/stylized-ggx-shading.html" target="_self">

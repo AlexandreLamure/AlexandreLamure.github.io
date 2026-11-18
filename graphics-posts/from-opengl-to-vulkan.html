@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Porting a small OpenGL engine to Vulkan — first principles.">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:site_name" content="Alexandre Lamure">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:url" content="https://alexandrelamure.github.io/graphics-posts/from-opengl-to-vulkan.html">
+    <meta property="og:title" content="From OpenGL to Vulkan | Alexandre Lamure">
+    <meta property="og:description" content="Porting a small OpenGL engine to Vulkan — first principles.">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2026-09-13">
+    <meta property="article:author" content="Alexandre Lamure">
+    <meta property="og:image" content="https://alexandrelamure.github.io/resources/graphics-posts/from-opengl-to-vulkan/thumbnail.jpg">
+    <meta property="og:image:alt" content="From OpenGL to Vulkan thumbnail">
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="From OpenGL to Vulkan | Alexandre Lamure">
+    <meta name="twitter:description" content="Porting a small OpenGL engine to Vulkan — first principles.">
+    <meta name="twitter:image" content="https://alexandrelamure.github.io/resources/graphics-posts/from-opengl-to-vulkan/thumbnail.jpg">
+    <meta name="twitter:image:alt" content="From OpenGL to Vulkan thumbnail">
+
+    <title>From OpenGL to Vulkan | Alexandre Lamure</title>
+    <link rel="canonical" href="https://alexandrelamure.github.io/graphics-posts/from-opengl-to-vulkan.html">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="icon" href="../resources/website-icon.jpg" type="image/jpeg">
+    <link rel="apple-touch-icon" href="../resources/website-icon.jpg">
+    <link rel="manifest" href="../site.webmanifest">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Syntax highlighting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          "headline": "From OpenGL to Vulkan",
+          "description": "Porting a small OpenGL engine to Vulkan — first principles.",
+          "image": "https://alexandrelamure.github.io/resources/graphics-posts/from-opengl-to-vulkan/thumbnail.jpg",
+          "datePublished": "2026-09-13",
+          "author": {
+            "@type": "Person",
+            "name": "Alexandre Lamure",
+            "url": "https://alexandrelamure.github.io/"
+          },
+          "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://alexandrelamure.github.io/graphics-posts/from-opengl-to-vulkan.html"
+          }
+        }
+    </script>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <a href="../index.html" class="logo">Alexandre Lamure</a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../graphics.html" class="active">Graphics</a></li>
+                <li><a href="../teaching.html">Teaching</a></li>
+                <li><a href="../music.html">Music</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="content">
+        <p><a class="btn-small" href="../graphics.html"><i class="fas fa-arrow-left"></i>Back to graphics</a></p>
+
+        <h1>From OpenGL to Vulkan</h1>
+        <div class="graphics-post-date"><time datetime="2026-09-13">September 13, 2026</time></div>
+        
+        <p>I recently ported a basic OpenGL engine to Vulkan (see <a class="simple-link" href="https://github.com/AlexandreLamure/nebula" target="_blank" rel="noopener noreferrer">nebula</a>).<br>
+        There are already plenty of great resources on transitioning from OpenGL to Vulkan:
+        </p>
+        <ul>
+            <li><a class="simple-link" href="https://developer.nvidia.com/transitioning-opengl-vulkan" target="_blank" rel="noopener noreferrer">Transitioning from OpenGL to Vulkan by NVIDIA</a></li>
+            <li><a class="simple-link" href="https://www.youtube.com/watch?v=yHNEecWwFOc" target="_blank" rel="noopener noreferrer">Vulkanised 2023: Use "bindless" to quickly port "bindful" OpenGL apps to Vulkan</a></li>
+            <li><a class="simple-link" href="https://anki3d.org/porting-anki-to-vulkan/" target="_blank" rel="noopener noreferrer">The journey of porting AnKi to Vulkan</a></li>
+            <li><a class="simple-link" href="https://blog.nap-framework.tech/d0/dfd/md_articles_001_nap_opengl_to_vulkan" target="_blank" rel="noopener noreferrer">NAPTECH: OpenGL to Vulkan</a></li>
+        </ul>
+        <p>But I wanted to modestly contribute. The goal here is not to provide a detailed guide, but rather a few-minute read covering the core principles.
+        Many people still learn graphics programming with OpenGL, and feel overwhelmed by the Vulkan API. I hope this post can help them get started.
+        </p>
+
+
+        <h2 style="margin-top:4.0rem;">What doesn't change</h2>
+        <p>The core ideas of OpenGL are still valid in Vulkan.</p>
+        <ul>
+            <li>We prepare resources like <b>buffers</b> and <b>textures</b> on the CPU, and <b>upload</b> them to the GPU.</li>
+            <li>We can draw things through a <b>rasterization</b> pipeline.</li>
+            <li>This pipeline is configured by <b>pipeline states</b> (blending mode, depth test, backface culling, etc.).</li>
+            <li>We use <b>shaders</b> (vertex, fragment, compute...) to program what happens on the GPU.</li>
+        </ul>
+
+
+        <h2 style="margin-top:4.0rem;">What does change</h2>
+        <p>OpenGL is a black box: many concepts are hidden and simplified. For the sake of performance and flexibility, Vulkan makes them explicit.</p>
+
+        <h3 style="font-size: 1.1rem; margin-top:3.0rem; line-height:0.5rem;">Device choice</h3>
+        <p>
+            <b style="color: #5586a4;">OpenGL</b>: We don't choose which GPU to use, the driver decides for us. It is certainly possible to influence this choice, but the API doesn't make GPU selection a central part of the programming model.
+        </p>
+        <p>
+            <b style="color: #ac162c;">Vulkan</b>: We enumerate the available <b>physical devices</b> (GPUs), inspect their capabilities, and then select one from which to create a <b>logical device</b>.
+            This explicit choice is important for applications that require high performance or predictability.<br>
+        </p>
+        <details>
+            <summary>Click to expand pseudo-code snippet</summary>
+            <pre><code class="language-cpp">// Enumerate physical devices
+uint32_t deviceCount = 0;
+vkEnumeratePhysicalDevices(&amp;deviceCount, nullptr);
+std::vector&lt;VkPhysicalDevice&gt; physicalDevices(deviceCount);
+vkEnumeratePhysicalDevices(&amp;deviceCount, physicalDevices.data());
+
+// Select the best GPU
+VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+for (auto candidate : physicalDevices) {
+    VkPhysicalDeviceProperties properties;
+    vkGetPhysicalDeviceProperties(candidate, &amp;properties);
+    if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
+        physicalDevice = candidate;
+        break;
+    }
+}
+
+// Create a logical device from the selected physical device
+VkDevice logicalDevice;
+vkCreateDevice(physicalDevice, &amp;logicalDevice);
+</code></pre>
+        <p>NB: This snippet is simplified and won't compile. If you want to actually implement this,
+            you should use the <a class="simple-link" href="https://docs.vulkan.org/spec/latest/index.html" target="_blank" rel="noopener noreferrer">Vulkan documentation</a> and the links mentioned at the end of this blog post.
+        </p>
+        </details>
+
+        <h3 style="font-size: 1.1rem; margin-top:3.0rem; line-height:0.5rem;">Scheduling</h3>
+        <p>
+            <b style="color: #5586a4;">OpenGL</b>: GPU scheduling is largely managed by the driver. Beginners tend to think that commands like <code>glBind*</code> or <code>glDraw*</code> are executed immediately,
+            because the API is designed to give that impression. In reality, they are queued and executed later. They might even get reordered, as OpenGL automatically infers dependencies and optimizes the workflow.
+        </p>
+        <p>
+            <b style="color: #ac162c;">Vulkan</b>: This mechanism isn't hidden anymore. We record a list of commands into a <b>command buffer</b>, then submit that command buffer to a queue. Nothing runs until we submit it.<br>
+            We're also responsible for expressing dependencies ourselves using barriers, semaphores and fences. It's more bookkeeping, but the payoff is that the driver has much less guesswork to do at runtime, and we control how work is organized and submitted.<br>
+            To go further, Vulkan allows us to fill command buffers with multiple threads, which is useful when CPU work gets heavy. We can also use multiple command queues to run different types of work in parallel on the GPU (e.g. compute, graphics, memory transfer).
+        </p>
+        <details>
+            <summary>Click to expand pseudo-code snippet</summary>
+            <pre><code class="language-cpp">// Record commands into a command buffer, nothing is drawn yet
+vkBeginCommandBuffer(commandBuffer);
+vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+vkCmdDrawIndexed(commandBuffer, indexCount);
+vkEndCommandBuffer(commandBuffer);
+
+// Submit the command buffer to a queue, rendering will start now
+vkQueueSubmit(queue, fence);
+</code></pre>
+        </details>
+
+        <h3 style="font-size: 1.1rem; margin-top:3.0rem; line-height:0.5rem;">Resource lifetime</h3>
+        <p>
+            <b style="color: #5586a4;">OpenGL</b>: We can delete a buffer after issuing a draw call using it, and OpenGL will make sure that the deletion doesn't happen while the GPU is still using the buffer.
+            The driver takes care of keeping the underlying objects alive for as long as necessary.
+        </p>
+        <p>
+            <b style="color: #ac162c;">Vulkan</b>: Resource lifetime is our responsibility. Destroying a buffer while the GPU still references it means trouble.
+            The CPU and GPU work asynchronously, so we use <b>fences</b> to signal when the GPU has finished using a resource.<br>
+            In practice, most engines don't check this per-resource. They keep a few <b>frames in flight</b>: while the GPU is still rendering frame N,
+            the CPU is already recording frame N+1. Each in-flight frame has its own command buffers and a fence.
+            We only destroy or reuse a resource once that frame's fence signals, so we know the GPU is done with it.
+        </p>
+        <details>
+            <summary>Click to expand diagram</summary>
+            <p>This diagram illustrates the lifecycle of an engine with 2 frames in flight.<br>
+                The fence #0 synchronizes frames #0, #2, #4, etc. After the CPU submits the commands for frame #0, the GPU begins processing them. Once the GPU has finished, it signals fence #0, allowing the CPU to reuse the resources associated with frame #0 for frame #2.<br>
+                Meanwhile, the fence #1 (not shown here) ensures the proper scheduling of frames #1, #3, #5, etc.
+            </p>
+            <img src="../resources/graphics-posts/from-opengl-to-vulkan/vulkan-scheduling.jpg" alt="Frames in flight and fences" style="width:min(140%,calc(100vw - 2rem));height:auto;display:block;margin:1rem 0 0 50%;transform:translateX(-50%);">
+        </details>
+        <details>
+            <summary>Click to expand pseudo-code snippet</summary>
+            <pre><code class="language-cpp">constexpr uint32_t FRAMES_IN_FLIGHT = 2; // Number of frames in flight
+VkCommandBuffer commandBuffers[FRAMES_IN_FLIGHT];
+VkFence fences[FRAMES_IN_FLIGHT]; // One fence per in-flight frame.
+VkBuffer uniformBuffers[FRAMES_IN_FLIGHT]; // Resources are duplicated per in-flight frame
+uint32_t frame = 0;
+
+// Main loop
+while(true) {
+    // Wait until the GPU has finished the last submit that used this slot
+    vkWaitForFences(&amp;fences[frame]);
+    vkResetFences(&amp;fences[frame]);
+
+    // Fence signaled: this frame's resources are no longer in use, we can rewrite it
+    memcpy(uniformMapped[frame], &amp;camera, sizeof(camera));
+
+    // Submit a command buffer with the frame's fence.
+    // The fence will be signaled when the GPU is done with the command buffer.
+    vkBeginCommandBuffer(commandBuffers[frame]);
+    vkCmdDrawIndexed(commandBuffers[frame], indexCount);
+    vkEndCommandBuffer(commandBuffers[frame]);
+    vkQueueSubmit(queue, fences[frame]);
+
+    // Increment the frame index.
+    frame = (frame + 1) % FRAMES_IN_FLIGHT;
+}
+</code></pre>
+        </details>
+        
+        <h3 style="font-size: 1.1rem; margin-top:3.0rem; line-height:0.5rem;">Descriptor sets</h3>
+        <p>
+            <b style="color: #5586a4;">OpenGL</b>: Binding resources is a sequence of individual calls. <code>glBindTexture</code>, <code>glBindBufferBase</code>, <code>glUniform*</code>... each one updates a piece
+            of OpenGL's global state machine: a texture unit, a buffer slot, a uniform value.<br>
+            The currently bound shader then reads from that state.
+        </p>
+        <p>
+            <b style="color: #ac162c;">Vulkan</b>: Resources are grouped into <b>descriptor sets</b>. There is no global binding state. 
+            The driver no longer has to reconstruct shader inputs from scattered slots, and we can reuse a set across many draws instead of rebinding everything from scratch.<br>
+            The usual trick is to split sets by update frequency: one set for data that changes once per frame (camera, lights), another for data that changes per draw or per pass (material textures).<br>
+            Tiny per-draw values like a model matrix usually go into <b>push constants</b>, a small fast path that doesn't need a descriptor set at all.
+        </p>
+        <details>
+            <summary>Click to expand pseudo-code snippet</summary>
+            <pre><code class="language-cpp">// Write camera data into the frame descriptor set, once per frame
+VkDescriptorSet frameSet;
+memcpy(cameraMapped, &amp;camera, sizeof(camera));
+VkDescriptorBufferInfo cameraInfo{ .buffer = cameraUBO, .range = VK_WHOLE_SIZE };
+VkWriteDescriptorSet frameWrite{
+    .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+    .dstSet = frameSet,
+    .dstBinding = 0,
+    .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+    .pBufferInfo = &amp;cameraInfo
+};
+vkUpdateDescriptorSets(device, &amp;frameWrite);
+vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, 0, &amp;frameSet);
+
+for (auto&amp; pass : passes) {
+    // Write material textures to the pass descriptor set, once per pass
+    VkDescriptorImageInfo albedoInfo{ .imageView = pass.albedoView };
+    VkDescriptorImageInfo normalInfo{ .imageView = pass.normalView };
+    VkDescriptorSet passSet = pass.set;
+    VkWriteDescriptorSet passWrites[] = {
+        {
+            .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+            .dstSet = passSet,
+            .dstBinding = 0,
+            .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+            .pImageInfo = &amp;albedoInfo
+        },
+        {
+            .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+            .dstSet = passSet,
+            .dstBinding = 1,
+            .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+            .pImageInfo = &amp;normalInfo
+        }
+    };
+    vkUpdateDescriptorSets(device, std::size(passWrites), passWrites);
+    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, 1, &amp;passSet);
+
+    for (auto&amp; object : pass.objects) {
+        // Write model matrix to push constants, once per object
+        vkCmdPushConstants(cmd, VK_SHADER_STAGE_VERTEX_BIT, sizeof(object.model), &amp;object.model);
+        // Once all bindings are bound to the command buffer, we can issue the draw call.
+        vkCmdDrawIndexed(cmd, object.indexCount);
+    }
+}
+</code></pre>
+        </details>
+        
+        <h3 style="font-size: 1.1rem; margin-top:3.0rem; line-height:0.5rem;">Image layout</h3>
+        <p>
+            <b style="color: #5586a4;">OpenGL</b>: A texture is a texture. We don't tell the driver how we intend to use it at a given moment; it rearranges GPU memory behind the scenes.
+        </p>
+        <p>
+            <b style="color: #ac162c;">Vulkan</b>: Images have an explicit <b>layout</b> that must match their current use.
+            <code>TRANSFER_DST_OPTIMAL</code> for uploads, <code>COLOR_ATTACHMENT_OPTIMAL</code> when rendering into them, <code>SHADER_READ_ONLY_OPTIMAL</code> when sampling, <code>PRESENT_SRC_KHR</code> when presenting to the swapchain.
+            We transition from one layout to another with a <b>barrier</b>. Using an image in the wrong layout is a classic source of validation errors (or silent corruption).
+        </p>
+        <details>
+            <summary>Click to expand pseudo-code snippet</summary>
+            <pre><code class="language-cpp">// After rendering into the image, transition it so a later pass can sample it
+VkImageMemoryBarrier barrier{
+    .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+    .oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+    .newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+    .image = image
+};
+vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                     VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, &amp;barrier);
+</code></pre>
+        </details>
+        
+        <h3 style="font-size: 1.1rem; margin-top:3.0rem; line-height:0.5rem;">Shader compilation</h3>
+        <p>
+            <b style="color: #5586a4;">OpenGL</b>: We ship GLSL source and compile it at runtime with <code>glCompileShader</code> / <code>glLinkProgram</code>. The driver turns it into GPU machine code, which means the generated code heavily depends on the user's hardware.
+        </p>
+        <p>
+            <b style="color: #ac162c;">Vulkan</b>: The API only accepts <b>SPIR-V</b>, an intermediate bytecode. We can still write our shaders in GLSL (or HLSL), but they are compiled to SPIR-V as part of our build pipeline rather than by the Vulkan driver at runtime.
+            This makes shader compilation more explicit and predictable.
+        </p>
+
+        <h2 style="margin-top:4.0rem;">Basic Vulkan setup</h2>
+        <p>To get started, you'll need to install the Vulkan SDK. It will provide you with some tools like validation layers (API error checking), a SPIR-V compiler, etc.
+            Then I recommend these libraries:
+        </p>
+        <ul>
+            <li><a class="simple-link" href="https://github.com/zeux/volk" target="_blank" rel="noopener noreferrer">volk</a> for function loading. It replaces glad or glew for OpenGL.</li>
+            <li><a class="simple-link" href="https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator" target="_blank" rel="noopener noreferrer">VMA</a> to simplify low-level memory management. That part was completely hidden in OpenGL.</li>
+            <li><a class="simple-link" href="https://github.com/charles-lunarg/vk-bootstrap" target="_blank" rel="noopener noreferrer">vk-bootstrap</a> can be a good addition if you want to reduce Vulkan's initialization boilerplate.</li>
+            <li><a class="simple-link" href="https://github.com/glfw/glfw" target="_blank" rel="noopener noreferrer">GLFW</a>,
+                <a class="simple-link" href="https://github.com/g-truc/glm" target="_blank" rel="noopener noreferrer">GLM</a>, 
+                <a class="simple-link" href="https://github.com/nothings/stb" target="_blank" rel="noopener noreferrer">stb</a>, 
+                <a class="simple-link" href="https://github.com/syoyo/tinygltf" target="_blank" rel="noopener noreferrer">tinygltf</a> and
+                <a class="simple-link" href="https://github.com/ocornut/imgui" target="_blank" rel="noopener noreferrer">ImGui</a>, which you may have used in OpenGL, still work great with Vulkan.</li>
+        </ul>
+
+        <h2 style="margin-top:4.0rem;">Architecture</h2>
+        <p>Vulkan forces us to build a proper architecture, even for small engines. Skip it, and you'll quickly end up with a slow, messy, bug-prone codebase — the API is less forgiving than OpenGL.<br>
+            Scene code and materials can stay close to your OpenGL engine, but the backend needs to handle work queues, resource lifetimes, and dependencies.
+        </p>
+        <p>The base layer is a <b>device</b>, a <b>swapchain</b>, and two <b>frames in flight</b> so the CPU can keep preparing frame N+1 while the GPU is still working on frame N.
+            Each of those two frames gets its own command buffer and fence, plus a <b>deletion queue</b>: instead of destroying a resource immediately, we push its handle into that frame's queue,
+            and it's only actually released once that frame's fence signals (i.e. once we know the GPU is done using it).
+        </p>
+        <p>To bind resources, a basic setup would be to use a descriptor set for the frame data (camera and lights) and another one for the pass data (material textures, model matrices, etc.).
+            As a starter I would advise managing the pass descriptor set through <code>vkCmdPushDescriptorSet</code>. This Vulkan 1.4 feature allows you to update your resources on-the-fly, in a simple inlined manner.<br>
+        If you wish to go further, you should learn about <b>bindless rendering</b>. The idea is to bind a single descriptor set containing a giant array of all the resources we need to draw the entire frame.
+        This allows us to avoid binding a new descriptor set for each object — something that hurts performance at scale. Once every texture and buffer is available on the GPU, drawing an object simply means fetching the giant array at the right index.
+        This lightweight index can be passed as a push constant.
+        </p>
+        <p>For image layout transitions, the cleanest approach is to build a <b>render graph</b> (a.k.a. "frame graph"). Rather than manually inserting barriers between every pass, we declare each pass along with the images it reads from and writes to;
+            the graph figures out the dependency order and inserts the right layout transitions and barriers for us. Then we can simply declare passes without worrying about synchronization. <br>
+            This abstraction layer can even be used to optimize the rendering pipeline, for example by minimizing the number of barriers and reusing a texture from a previous pass instead of allocating a new one.
+        </p>
+
+        <h2 style="margin-top:4.0rem;">Further reading</h2>
+        <p>If you want to actually implement a Vulkan engine, I recommend the following resources:</p>
+        <ul>
+            <li><a class="simple-link" href="https://vulkan-tutorial.com/Introduction" target="_blank" rel="noopener noreferrer">vulkan-tutorial.com</a>, a complete walkthrough, though somewhat outdated</li>
+            <li><a class="simple-link" href="https://vkguide.dev/" target="_blank" rel="noopener noreferrer">vkguide.dev</a>, a more modern guide</li>
+            <li><a class="simple-link" href="https://howtovulkan.com/" target="_blank" rel="noopener noreferrer">howtovulkan.com</a>, with an emphasis on modern Vulkan 1.3 features</li>
+        </ul>
+
+        <p><a class="btn-small" style="margin-top:2rem;" href="../graphics.html"><i class="fas fa-arrow-left"></i>Back to graphics</a></p>
+    </main>
+</body>
+
+</html>
